@@ -1,0 +1,590 @@
+{
+  "text": "新材料的发现与设计，是推动科技进步的重要力量。从能源材料到半导体，研究人员不断探索新的组成与结构，希望获得性能更优的材料。 但材料研发面临巨大挑战。潜在材料空间庞大，传统研究往往依赖经验和反复试验；从材料制备、性能表征到方案调整，需要投入大量时间与资源。 与此同时，材料性能与微观结构、原子运动和电子行为密切相关。如何理解物理机制、预测材料性质，并找到值得探索的设计方向，是材料研究的核心问题。",
+  "spoken_text": "新材料的发现与设计，是推动科技进步的重要力量。从能源材料到半导体，研究人员不断探索新的组成与结构，希望获得性能更优的材料。 但材料研发面临巨大挑战。潜在材料空间庞大，传统研究往往依赖经验和反复试验；从材料制备、性能表征到方案调整，需要投入大量时间与资源。 与此同时，材料性能与微观结构、原子运动和电子行为密切相关。如何理解物理机制、预测材料性质，并找到值得探索的设计方向，是材料研究的核心问题。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 7125000,
+      "text": "新材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 8125000,
+      "duration": 1000000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 9250000,
+      "duration": 3750000,
+      "text": "发现"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 13250000,
+      "duration": 1125000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 14500000,
+      "duration": 4375000,
+      "text": "设计"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 21125000,
+      "duration": 1750000,
+      "text": "是"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 23000000,
+      "duration": 4000000,
+      "text": "推动"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 27125000,
+      "duration": 3750000,
+      "text": "科技"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 31000000,
+      "duration": 4250000,
+      "text": "进步"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 35250000,
+      "duration": 1375000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 36750000,
+      "duration": 3750000,
+      "text": "重要"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 40625000,
+      "duration": 3625000,
+      "text": "力量"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 50000000,
+      "duration": 2125000,
+      "text": "从"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 52250000,
+      "duration": 3125000,
+      "text": "能源"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 55500000,
+      "duration": 4000000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 59750000,
+      "duration": 1750000,
+      "text": "到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 61625000,
+      "duration": 6125000,
+      "text": "半导体"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 71000000,
+      "duration": 2625000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 73750000,
+      "duration": 3375000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 77250000,
+      "duration": 3625000,
+      "text": "不断"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 81000000,
+      "duration": 4500000,
+      "text": "探索"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 85750000,
+      "duration": 2750000,
+      "text": "新"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 88500000,
+      "duration": 1125000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 89750000,
+      "duration": 4125000,
+      "text": "组成"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 94125000,
+      "duration": 1125000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 95375000,
+      "duration": 4125000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 101875000,
+      "duration": 2750000,
+      "text": "希望"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 104750000,
+      "duration": 3125000,
+      "text": "获得"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 108125000,
+      "duration": 3875000,
+      "text": "性能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 112250000,
+      "duration": 2375000,
+      "text": "更"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 114625000,
+      "duration": 2000000,
+      "text": "优"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 116625000,
+      "duration": 875000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 117625000,
+      "duration": 4500000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 127875000,
+      "duration": 2625000,
+      "text": "但"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 130750000,
+      "duration": 3625000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 134500000,
+      "duration": 4500000,
+      "text": "研发"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 140000000,
+      "duration": 3500000,
+      "text": "面临"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 143750000,
+      "duration": 4000000,
+      "text": "巨大"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 147875000,
+      "duration": 4125000,
+      "text": "挑战"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 157750000,
+      "duration": 4000000,
+      "text": "潜在"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 161875000,
+      "duration": 4250000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 166375000,
+      "duration": 3250000,
+      "text": "空间"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 169750000,
+      "duration": 4500000,
+      "text": "庞大"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 177125000,
+      "duration": 4250000,
+      "text": "传统"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 181500000,
+      "duration": 3875000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 185625000,
+      "duration": 4125000,
+      "text": "往往"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 189875000,
+      "duration": 3500000,
+      "text": "依赖"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 193500000,
+      "duration": 4000000,
+      "text": "经验"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 197750000,
+      "duration": 1500000,
+      "text": "和"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 199375000,
+      "duration": 4250000,
+      "text": "反复"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 203750000,
+      "duration": 3250000,
+      "text": "试验"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 210375000,
+      "duration": 2375000,
+      "text": "从"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 212875000,
+      "duration": 4625000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 217625000,
+      "duration": 3750000,
+      "text": "制备"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 223875000,
+      "duration": 3125000,
+      "text": "性能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 227125000,
+      "duration": 4125000,
+      "text": "表征"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 232375000,
+      "duration": 1875000,
+      "text": "到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 234375000,
+      "duration": 2750000,
+      "text": "方案"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 237250000,
+      "duration": 4125000,
+      "text": "调整"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 243375000,
+      "duration": 3125000,
+      "text": "需要"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 246625000,
+      "duration": 3750000,
+      "text": "投入"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 250625000,
+      "duration": 4125000,
+      "text": "大量"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 254875000,
+      "duration": 3625000,
+      "text": "时间"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 258750000,
+      "duration": 1375000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 260250000,
+      "duration": 3875000,
+      "text": "资源"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 269875000,
+      "duration": 6625000,
+      "text": "与此同时"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 280000000,
+      "duration": 4250000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 284375000,
+      "duration": 3875000,
+      "text": "性能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 288500000,
+      "duration": 1250000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 289875000,
+      "duration": 4375000,
+      "text": "微观"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 294375000,
+      "duration": 3750000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 300625000,
+      "duration": 7750000,
+      "text": "原子运动"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 309625000,
+      "duration": 1875000,
+      "text": "和"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 311625000,
+      "duration": 3375000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 315125000,
+      "duration": 4000000,
+      "text": "行为"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 319375000,
+      "duration": 4375000,
+      "text": "密切"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 323875000,
+      "duration": 4625000,
+      "text": "相关"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 334250000,
+      "duration": 3625000,
+      "text": "如何"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 338000000,
+      "duration": 4250000,
+      "text": "理解"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 342375000,
+      "duration": 3250000,
+      "text": "物理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 345750000,
+      "duration": 4375000,
+      "text": "机制"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 352125000,
+      "duration": 3750000,
+      "text": "预测"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 356125000,
+      "duration": 3750000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 360000000,
+      "duration": 3875000,
+      "text": "性质"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 366000000,
+      "duration": 1875000,
+      "text": "并"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 368000000,
+      "duration": 3625000,
+      "text": "找到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 371875000,
+      "duration": 2750000,
+      "text": "值得"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 374750000,
+      "duration": 5125000,
+      "text": "探索"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 379875000,
+      "duration": 750000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 380875000,
+      "duration": 3125000,
+      "text": "设计"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 384125000,
+      "duration": 3375000,
+      "text": "方向"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 390000000,
+      "duration": 1875000,
+      "text": "是"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 392000000,
+      "duration": 4000000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 396125000,
+      "duration": 3750000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 399875000,
+      "duration": 1250000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 401375000,
+      "duration": 3875000,
+      "text": "核心"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 405375000,
+      "duration": 3625000,
+      "text": "问题"
+    }
+  ]
+}

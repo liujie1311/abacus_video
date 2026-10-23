@@ -1,0 +1,14 @@
+[
+  {
+    "file": "C:\\Users\\13118\\Desktop\\素材\\屏幕录制 2026-10-15 161830.mp4",
+    "duration_seconds": 10.03,
+    "metadata": "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\Users\\13118\\Desktop\\素材\\屏幕录制 2026-10-15 161830.mp4':\n  Metadata:\n    major_brand     : mp42\n    minor_version   : 0\n    compatible_brands: mp41isom\n    creation_time   : 2026-10-15T08:18:20.000000Z\n  Duration: 00:00:10.03, start: 0.000000, bitrate: 29220 kb/s\n  Stream #0:0[0x1](und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 3800x2020 [SAR 1:1 DAR 190:101], 29025 kb/s, 30 fps, 30 tbr, 30k tbn (default)\n      Metadata:\n        creation_time   : 2026-10-15T08:18:20.000000Z\n        handler_name    : VideoHandler\n        vendor_id       : [0][0][0][0]\n        encoder         : AVC Coding\n  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 192 kb/s (default)\n      Metadata:\n        creation_time   : 2026-10-15T08:18:20.000000Z\n        handler_name    : SoundHandler\n        vendor_id       : [0][0][0][0]\nAt least one output file must be specified\n",
+    "contact": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\五分钟宣传片_补充素材_20261023\\05_预览与索引\\原始录屏1_总览.jpg"
+  },
+  {
+    "file": "C:\\Users\\13118\\Desktop\\素材\\屏幕录制 2026-10-16 111243.mp4",
+    "duration_seconds": 6.27,
+    "metadata": "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\Users\\13118\\Desktop\\素材\\屏幕录制 2026-10-16 111243.mp4':\n  Metadata:\n    major_brand     : mp42\n    minor_version   : 0\n    compatible_brands: mp41isom\n    creation_time   : 2026-10-16T03:12:37.000000Z\n  Duration: 00:00:06.27, start: 0.000000, bitrate: 27663 kb/s\n  Stream #0:0[0x1](und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 3830x2032 [SAR 1:1 DAR 1915:1016], 27469 kb/s, 30 fps, 30 tbr, 30k tbn (default)\n      Metadata:\n        creation_time   : 2026-10-16T03:12:37.000000Z\n        handler_name    : VideoHandler\n        vendor_id       : [0][0][0][0]\n        encoder         : AVC Coding\n  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 192 kb/s (default)\n      Metadata:\n        creation_time   : 2026-10-16T03:12:37.000000Z\n        handler_name    : SoundHandler\n        vendor_id       : [0][0][0][0]\nAt least one output file must be specified\n",
+    "contact": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\五分钟宣传片_补充素材_20261023\\05_预览与索引\\原始录屏2_总览.jpg"
+  }
+]

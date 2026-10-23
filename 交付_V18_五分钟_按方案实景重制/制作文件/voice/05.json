@@ -1,0 +1,362 @@
+{
+  "text": "对于电子结构研究，平台同样能够衔接专业计算与分析流程。 通过能带结构、电子态密度等结果，研究人员可以分析材料的电子性质，探索微观电子结构与材料性能之间的联系。 从复杂的计算数据中提取有价值的科学信息，为理解材料性质、研究物理机制提供依据。",
+  "spoken_text": "对于电子结构研究，平台同样能够衔接专业计算与分析流程。 通过能带结构、电子态密度等结果，研究人员可以分析材料的电子性质，探索微观电子结构与材料性能之间的联系。 从复杂的计算数据中提取有价值的科学信息，为理解材料性质、研究物理机制提供依据。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 3000000,
+      "text": "对于"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 4125000,
+      "duration": 3375000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 7625000,
+      "duration": 3125000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 10875000,
+      "duration": 4000000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 17375000,
+      "duration": 4250000,
+      "text": "平台"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 21875000,
+      "duration": 3625000,
+      "text": "同样"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 25625000,
+      "duration": 2750000,
+      "text": "能够"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 28500000,
+      "duration": 4375000,
+      "text": "衔接"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 33125000,
+      "duration": 3000000,
+      "text": "专业"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 36250000,
+      "duration": 5500000,
+      "text": "计算与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 42750000,
+      "duration": 4500000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 47375000,
+      "duration": 4000000,
+      "text": "流程"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 57000000,
+      "duration": 3250000,
+      "text": "通过"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 60500000,
+      "duration": 1375000,
+      "text": "能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 62000000,
+      "duration": 1750000,
+      "text": "带"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 63750000,
+      "duration": 3625000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 70375000,
+      "duration": 6625000,
+      "text": "电子态"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 77125000,
+      "duration": 3375000,
+      "text": "密度"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 80500000,
+      "duration": 1500000,
+      "text": "等"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 82125000,
+      "duration": 4500000,
+      "text": "结果"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 88875000,
+      "duration": 2875000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 91875000,
+      "duration": 3375000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 95500000,
+      "duration": 2625000,
+      "text": "可以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 98250000,
+      "duration": 3875000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 102250000,
+      "duration": 4625000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 106875000,
+      "duration": 1125000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 108250000,
+      "duration": 3375000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 111750000,
+      "duration": 4250000,
+      "text": "性质"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 119500000,
+      "duration": 4750000,
+      "text": "探索"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 124500000,
+      "duration": 4250000,
+      "text": "微观"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 128875000,
+      "duration": 3000000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 132000000,
+      "duration": 4125000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 137375000,
+      "duration": 1375000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 138875000,
+      "duration": 4625000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 143750000,
+      "duration": 4000000,
+      "text": "性能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 147875000,
+      "duration": 3125000,
+      "text": "之间"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 151000000,
+      "duration": 750000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 151875000,
+      "duration": 3750000,
+      "text": "联系"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 161375000,
+      "duration": 2750000,
+      "text": "从"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 164250000,
+      "duration": 4000000,
+      "text": "复杂"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 168250000,
+      "duration": 1000000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 169500000,
+      "duration": 3250000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 172875000,
+      "duration": 3125000,
+      "text": "数据"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 176000000,
+      "duration": 1750000,
+      "text": "中"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 178875000,
+      "duration": 4000000,
+      "text": "提取"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 183125000,
+      "duration": 1875000,
+      "text": "有"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 185125000,
+      "duration": 4250000,
+      "text": "价值"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 189375000,
+      "duration": 1250000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 190875000,
+      "duration": 3875000,
+      "text": "科学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 194875000,
+      "duration": 4250000,
+      "text": "信息"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 201375000,
+      "duration": 2375000,
+      "text": "为"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 203875000,
+      "duration": 4000000,
+      "text": "理解"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 208000000,
+      "duration": 3875000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 212000000,
+      "duration": 3750000,
+      "text": "性质"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 218500000,
+      "duration": 3875000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 222625000,
+      "duration": 3125000,
+      "text": "物理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 225875000,
+      "duration": 4000000,
+      "text": "机制"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 230125000,
+      "duration": 3750000,
+      "text": "提供"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 234000000,
+      "duration": 3875000,
+      "text": "依据"
+    }
+  ]
+}

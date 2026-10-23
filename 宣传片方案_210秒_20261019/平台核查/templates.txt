@@ -1,0 +1,159 @@
+<template>
+  <div class="page-stack templates-browse-page">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">模板库</h1>
+      </div>
+    </div>
+
+    <TemplateLibraryBrowser
+      variant="page"
+      :categories="templateStore.categories"
+      :templates="templateStore.templates"
+      :filters="templateStore.filters"
+      :loading="templateStore.loading"
+      :current-page="templateStore.currentPage"
+      :page-size="templateStore.pagination.limit"
+      :total="templateStore.pagination.total"
+      :has-filters="hasActiveFilters"
+      @select-category="selectTemplateCategory"
+      @update-filter="updateTemplateFilter"
+      @reset-filters="resetFilters"
+      @reload="reloadTemplates"
+      @select-template="openTemplateDetail"
+      @change-page="changeTemplatePage"
+      @change-page-size="changeTemplatePageSize"
+    />
+  </div>
+</template>
+
+<script setup>
+import { computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useTemplateStore } from '@/stores/templates'
+import TemplateLibraryBrowser from './components/TemplateLibraryBrowser.vue'
+
+const route = useRoute()
+const router = useRouter()
+const templateStore = useTemplateStore()
+
+const hasActiveFilters = computed(() =>
+  Boolean(
+    templateStore.filters.keyword ||
+    templateStore.filters.category ||
+    templateStore.filters.tag,
+  ),
+)
+const routeProjectId = computed(() => String(route.query.project_id || route.query.projectId || '').trim())
+
+function getTemplateListRequestParams(params = {}) {
+  return {
+    project_id: undefined,
+    is_builtin: '0',
+    ...params,
+  }
+}
+
+function buildTemplatePath(templateId) {
+  return `/templates/${encodeURIComponent(templateId)}`
+}
+
+function buildProjectContextQuery(projectId = routeProjectId.value) {
+  return projectId ? { project_id: projectId } : {}
+}
+
+function selectTemplateCategory(category) {
+  templateStore.filters.category = category
+}
+
+function updateTemplateFilter(field, value) {
+  if (field === 'keyword' || field === 'tag') {
+    templateStore.filters[field] = value
+  }
+}
+
+function openTemplateDetail(template) {
+  if (!template?.id) {
+    return
+  }
+
+  router.push({
+    path: buildTemplatePath(template.id),
+    query: buildProjectContextQuery(),
+  })
+}
+
+function resetFilters() {
+  templateStore.filters.keyword = ''
+  templateStore.filters.category = ''
+  templateStore.filters.builtin = ''
+  templateStore.filters.tag = ''
+  router.replace({
+    path: '/templates',
+    query: buildProjectContextQuery(),
+  })
+}
+
+async function reloadTemplates() {
+  templateStore.setProjectFilter('')
+  await templateStore.loadTemplates(getTemplateListRequestParams({
+    offset: 0,
+  }))
+}
+
+async function changeTemplatePage(page) {
+  await templateStore.loadTemplates(getTemplateListRequestParams({
+    offset: (page - 1) * templateStore.pagination.limit,
+  }))
+}
+
+async function changeTemplatePageSize(size) {
+  await templateStore.loadTemplates(getTemplateListRequestParams({
+    limit: size,
+    offset: 0,
+  }))
+}
+
+async function syncProjectFilterFromRoute() {
+  templateStore.setProjectFilter('')
+  templateStore.filters.builtin = ''
+  await templateStore.loadTemplates(getTemplateListRequestParams({ offset: 0 }))
+}
+
+onMounted(async () => {
+  templateStore.setProjectFilter('')
+  templateStore.filters.builtin = ''
+  await templateStore.loadTemplates(getTemplateListRequestParams({ offset: 0 }))
+})
+
+watch(routeProjectId, syncProjectFilterFromRoute)
+
+watch(
+  () => [
+    templateStore.filters.keyword,
+    templateStore.filters.category,
+    templateStore.filters.tag,
+  ],
+  () => {
+    templateStore.loadTemplates(getTemplateListRequestParams({ offset: 0 }))
+  },
+)
+</script>
+
+<style scoped>
+.templates-browse-page {
+  grid-template-rows: auto minmax(0, 1fr);
+  height: calc(var(--design-height, 100vh) - 124px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 1100px) {
+  .templates-browse-page {
+    height: auto;
+    overflow: visible;
+  }
+}
+</style>
+

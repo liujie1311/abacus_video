@@ -1,0 +1,41 @@
+{
+  "size": [
+    1920,
+    1080
+  ],
+  "scenes": [
+    {
+      "file": "01_开场.png",
+      "time": "00:00–00:05"
+    },
+    {
+      "file": "02_自然语言提问.png",
+      "time": "00:05–00:14"
+    },
+    {
+      "file": "03_平台操作.png",
+      "time": "00:14–00:24"
+    },
+    {
+      "file": "04_数据可视化.png",
+      "time": "00:24–00:35"
+    },
+    {
+      "file": "05_分析与验证.png",
+      "time": "00:35–00:45"
+    },
+    {
+      "file": "06_流程回顾.png",
+      "time": "00:45–00:54"
+    },
+    {
+      "file": "07_品牌片尾.png",
+      "time": "00:54–01:00"
+    }
+  ],
+  "additional": [
+    "05b_局限说明.png",
+    "05c_验证建议.png"
+  ],
+  "note": "Static review artwork. The input and summary are designed callouts; operation and scientific plots use existing project assets."
+}

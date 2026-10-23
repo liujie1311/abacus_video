@@ -1,0 +1,15 @@
+{
+  "duration_seconds": 300.0106666666667,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "decode_errors": 0,
+  "audio_peak": 0.8005691766738892,
+  "size_mb": 40.1,
+  "shots": 39,
+  "chapters": 8,
+  "subtitles": "burned-in Chinese plus external SRT",
+  "voice": "zh-CN-YunjianNeural",
+  "voice_speed": 1.0,
+  "source_note": "用户原稿、截图、参考片及原创概念动画；不含伪造研究数据"
+}

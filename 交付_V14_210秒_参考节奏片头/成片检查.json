@@ -1,0 +1,39 @@
+{
+  "duration_seconds": 210.00533333333334,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "video_codec": "H.264",
+  "audio_codec": "AAC",
+  "decode_errors": 0,
+  "audio_peak_linear": 0.7138487100601196,
+  "internal_black_frames": false,
+  "male_voice": "zh-CN-YunjianNeural",
+  "narration_sections": 10,
+  "narration_overruns": 0,
+  "shots": 26,
+  "size_mb": 27.3,
+  "checks": "Full decode, audio duration and peak, narration boundaries, black detection, encoded-frame contact sheet. No listening claim.",
+  "audio_bitstream_identical_to_v13": true,
+  "after_7s_frame_samples": [
+    {
+      "time": 8,
+      "mean_pixel_difference_255_scale": 0.8133924603462219
+    },
+    {
+      "time": 38,
+      "mean_pixel_difference_255_scale": 1.0079784393310547
+    },
+    {
+      "time": 105,
+      "mean_pixel_difference_255_scale": 0.9893081188201904
+    },
+    {
+      "time": 151,
+      "mean_pixel_difference_255_scale": 0.9739403128623962
+    },
+    {
+      "time": 207,
+      "mean_pixel_difference_255_scale": 1.1619032621383667
+    }
+  ]
+}

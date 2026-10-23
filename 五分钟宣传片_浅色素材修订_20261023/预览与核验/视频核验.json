@@ -1,0 +1,106 @@
+[
+  {
+    "file": "01_浅色动画\\M00_浅色立体原子片头_6秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:06.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 2629 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M01_微观晶体结构_浅色_12秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:12.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 1995 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M02_材料探索空间_浅色_10秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:10.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 1610 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M03_研发迭代流程_浅色_10秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:10.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 145 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M04_AI与计算流程_浅色_12秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:12.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 120 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M05_计算支撑设计_浅色_12秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:12.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 125 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M06_品牌循环背景_浅色_10秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:10.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 2193 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "01_浅色动画\\M07_铝合金研究场景_MSD原图_10秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:10.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 139 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "02_案例与成片\\ABACUSLab_60秒_浅色原子片头_参考片修订.mp4",
+    "decode_ok": true,
+    "duration": "00:01:00.01",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1198 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 72 kb/s (default)",
+    "errors": ""
+  },
+  {
+    "file": "02_案例与成片\\C01_铝合金案例_沿用参考片_36秒_无声.mp4",
+    "decode_ok": true,
+    "duration": "00:00:36.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 791 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "02_案例与成片\\R01_真实对话到MSD_浅色边框_1080p.mp4",
+    "decode_ok": true,
+    "duration": "00:00:10.03",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 999 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "制作文件\\浅色转场_2秒.mp4",
+    "decode_ok": true,
+    "duration": "00:00:02.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 5094 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  },
+  {
+    "file": "浅色素材_26秒连贯预览.mp4",
+    "decode_ok": true,
+    "duration": "00:00:26.00",
+    "video": "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1263 kb/s, 30 fps, 30 tbr, 15360 tbn (default)",
+    "audio": "",
+    "errors": ""
+  }
+]

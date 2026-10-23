@@ -1,0 +1,133 @@
+<template>
+  <div class="page-stack">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">事件日志</h1>
+        <div class="page-subtitle">通过 WebSocket 接收 workflow、task 和 system 实时事件。</div>
+      </div>
+      <el-space wrap>
+        <el-tag :type="eventStore.status === 'open' ? 'success' : 'info'" effect="plain">
+          {{ eventStatusText }}
+        </el-tag>
+        <!-- <el-button :icon="Connection" @click="eventStore.connect()">连接</el-button>
+        <el-button :icon="Close" @click="eventStore.disconnect()">断开</el-button> -->
+        <el-button :icon="Delete" type="danger" plain @click="eventStore.clearEvents()">清空</el-button>
+      </el-space>
+    </div>
+
+    <el-card shadow="never">
+      <template #header>
+        <div class="filter-row">
+          <el-input v-model="keyword" class="event-search" clearable placeholder="搜索工作流 ID / 任务 ID / 消息" />
+          <el-select v-model="typeFilter" class="event-type-filter" clearable placeholder="事件类型">
+            <el-option label="工作流" value="workflow" />
+            <el-option label="任务" value="task" />
+            <el-option label="系统" value="system" />
+          </el-select>
+        </div>
+      </template>
+
+      <el-table :data="filteredEvents" height="620" stripe>
+        <el-table-column prop="timestamp" label="时间" width="190">
+          <template #default="{ row }">{{ formatDate(row.timestamp) }}</template>
+        </el-table-column>
+        <el-table-column prop="type" label="类型" width="190">
+          <template #default="{ row }">
+            <el-tag :title="row.type" :type="eventTypeTag(row.type)" effect="plain">{{ eventTypeText(row.type) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="workflowId" label="工作流 ID" min-width="260">
+          <template #default="{ row }">
+            <span class="event-cell-id">{{ row.workflowId || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="taskId" label="任务 ID" min-width="240">
+          <template #default="{ row }">
+            <span class="event-cell-id">{{ row.taskId || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="消息" min-width="280">
+          <template #default="{ row }">
+            <span class="event-cell-message">{{ row.message || '-' }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+  </div>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import { Close, Connection, Delete } from '@element-plus/icons-vue'
+
+import { useEventStore } from '@/stores/events'
+import { eventTypeTag, eventTypeText, formatDate } from '@/utils/format'
+
+const eventStore = useEventStore()
+const keyword = ref('')
+const typeFilter = ref('')
+const eventStatusText = computed(() => {
+  const map = {
+    connecting: '连接中',
+    open: '已连接',
+    disconnected: '已断开',
+    error: '连接异常',
+  }
+
+  return map[eventStore.status] || eventStore.status
+})
+
+const filteredEvents = computed(() => {
+  const value = keyword.value.trim().toLowerCase()
+
+  return eventStore.events.filter((event) => {
+    const typeMatched = !typeFilter.value || event.type.includes(typeFilter.value)
+    const keywordMatched =
+      !value ||
+      String(event.workflowId || '').toLowerCase().includes(value) ||
+      String(event.taskId || '').toLowerCase().includes(value) ||
+      String(event.message || '').toLowerCase().includes(value)
+
+    return typeMatched && keywordMatched
+  })
+})
+</script>
+
+<style scoped>
+.event-search {
+  width: min(100%, 360px);
+}
+
+.event-type-filter {
+  width: 180px;
+}
+
+.event-cell-id,
+.event-cell-message {
+  display: block;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+.event-cell-id {
+  color: var(--app-text-muted);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-small);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.event-cell-message {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 560px) {
+  .event-search,
+  .event-type-filter {
+    width: 100%;
+  }
+}
+</style>
+

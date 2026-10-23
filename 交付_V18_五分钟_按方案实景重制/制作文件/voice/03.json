@@ -1,0 +1,446 @@
+{
+  "text": "在这些专业能力之上，ABACUSLab 引入 AI 智能体。 研究人员可以用自然语言描述研究目标，AI 辅助梳理研究思路、识别所需条件、规划计算流程，并协助组织计算任务。 从研究问题到计算方案，再到任务执行与结果分析，平台将不同环节更加紧密地连接起来。研究人员可以检查和调整计算方案，让 AI 辅助与专业判断相结合。",
+  "spoken_text": "在这些专业能力之上，ABACUS LAB 引入 AI 智能体。 研究人员可以用自然语言描述研究目标，AI 辅助梳理研究思路、识别所需条件、规划计算流程，并协助组织计算任务。 从研究问题到计算方案，再到任务执行与结果分析，平台将不同环节更加紧密地连接起来。研究人员可以检查和调整计算方案，让 AI 辅助与专业判断相结合。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 2000000,
+      "text": "在"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 3125000,
+      "duration": 3500000,
+      "text": "这些"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 6875000,
+      "duration": 2875000,
+      "text": "专业"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 9875000,
+      "duration": 2125000,
+      "text": "能力"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 12125000,
+      "duration": 3625000,
+      "text": "之上"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 18000000,
+      "duration": 4250000,
+      "text": "ABACUS"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 22375000,
+      "duration": 2250000,
+      "text": "LAB"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 24750000,
+      "duration": 4000000,
+      "text": "引入"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 30000000,
+      "duration": 3875000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 34000000,
+      "duration": 5625000,
+      "text": "智能体"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 45375000,
+      "duration": 3250000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 48750000,
+      "duration": 3375000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 52375000,
+      "duration": 2500000,
+      "text": "可以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 54875000,
+      "duration": 2250000,
+      "text": "用"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 57375000,
+      "duration": 2750000,
+      "text": "自然"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 60250000,
+      "duration": 4125000,
+      "text": "语言"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 65375000,
+      "duration": 4250000,
+      "text": "描述"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 69875000,
+      "duration": 3250000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 73250000,
+      "duration": 4250000,
+      "text": "目标"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 80875000,
+      "duration": 4250000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 85250000,
+      "duration": 4125000,
+      "text": "辅助"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 89500000,
+      "duration": 3625000,
+      "text": "梳理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 93375000,
+      "duration": 3125000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 96625000,
+      "duration": 3500000,
+      "text": "思路"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 103000000,
+      "duration": 4125000,
+      "text": "识别"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 107250000,
+      "duration": 2000000,
+      "text": "所"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 109250000,
+      "duration": 1500000,
+      "text": "需"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 110875000,
+      "duration": 4125000,
+      "text": "条件"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 116875000,
+      "duration": 4625000,
+      "text": "规划"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 121625000,
+      "duration": 3250000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 125000000,
+      "duration": 4000000,
+      "text": "流程"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 131000000,
+      "duration": 1875000,
+      "text": "并"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 133000000,
+      "duration": 4375000,
+      "text": "协助"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 137500000,
+      "duration": 3625000,
+      "text": "组织"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 141375000,
+      "duration": 3375000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 144875000,
+      "duration": 2875000,
+      "text": "任务"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 153500000,
+      "duration": 2250000,
+      "text": "从"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 156000000,
+      "duration": 3250000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 159375000,
+      "duration": 3375000,
+      "text": "问题"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 163000000,
+      "duration": 1750000,
+      "text": "到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 164875000,
+      "duration": 3750000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 168750000,
+      "duration": 3125000,
+      "text": "方案"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 174625000,
+      "duration": 2125000,
+      "text": "再"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 176750000,
+      "duration": 1750000,
+      "text": "到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 178625000,
+      "duration": 7500000,
+      "text": "任务执行"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 186375000,
+      "duration": 1500000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 188000000,
+      "duration": 3750000,
+      "text": "结果"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 191875000,
+      "duration": 4500000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 198875000,
+      "duration": 4000000,
+      "text": "平台"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 203000000,
+      "duration": 1625000,
+      "text": "将"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 204875000,
+      "duration": 2875000,
+      "text": "不同"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 207875000,
+      "duration": 4500000,
+      "text": "环节"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 213500000,
+      "duration": 4375000,
+      "text": "更加"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 218000000,
+      "duration": 4250000,
+      "text": "紧密"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 222250000,
+      "duration": 1125000,
+      "text": "地"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 223625000,
+      "duration": 3250000,
+      "text": "连接"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 227000000,
+      "duration": 3000000,
+      "text": "起来"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 235750000,
+      "duration": 3000000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 238875000,
+      "duration": 3000000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 242125000,
+      "duration": 2375000,
+      "text": "可以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 244625000,
+      "duration": 4500000,
+      "text": "检查"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 249375000,
+      "duration": 1250000,
+      "text": "和"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 250750000,
+      "duration": 4375000,
+      "text": "调整"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 255375000,
+      "duration": 3000000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 258500000,
+      "duration": 3250000,
+      "text": "方案"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 265125000,
+      "duration": 2000000,
+      "text": "让"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 267500000,
+      "duration": 3750000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 271375000,
+      "duration": 4625000,
+      "text": "辅助"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 276250000,
+      "duration": 1500000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 277875000,
+      "duration": 3000000,
+      "text": "专业"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 281000000,
+      "duration": 4250000,
+      "text": "判断"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 285500000,
+      "duration": 1875000,
+      "text": "相"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 287375000,
+      "duration": 4375000,
+      "text": "结合"
+    }
+  ]
+}

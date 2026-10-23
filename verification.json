@@ -1,0 +1,13 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 30.0,
+  "frames": 1800,
+  "duration": 60.0,
+  "bytes": 9135615,
+  "decode_returncode": 0,
+  "decode_errors": "",
+  "audio_seconds": 60.010666666666665,
+  "audio_peak": 0.7713339924812317,
+  "audio_rms": 0.10302551090717316
+}

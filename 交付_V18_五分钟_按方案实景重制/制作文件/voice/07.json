@@ -1,0 +1,236 @@
+{
+  "text": "AI 提供智能辅助，第一性原理计算提供物理依据，研究人员结合科学知识作出判断。 ABACUSLab，AI 驱动的材料计算与设计平台。 让材料计算更简单，把更多精力，留给研究与发现。",
+  "spoken_text": "AI 提供智能辅助，第一性原理计算提供物理依据，研究人员结合科学知识作出判断。 ABACUS LAB，AI 驱动的材料计算与设计平台。 让材料计算更简单，把更多精力，留给研究与发现。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 3375000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 4500000,
+      "duration": 4375000,
+      "text": "提供"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 9000000,
+      "duration": 2875000,
+      "text": "智能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 12000000,
+      "duration": 3625000,
+      "text": "辅助"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 17750000,
+      "duration": 3875000,
+      "text": "第一性"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 21750000,
+      "duration": 3000000,
+      "text": "原理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 24875000,
+      "duration": 3625000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 29625000,
+      "duration": 4625000,
+      "text": "提供"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 34500000,
+      "duration": 3500000,
+      "text": "物理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 38125000,
+      "duration": 4250000,
+      "text": "依据"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 45625000,
+      "duration": 2875000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 48625000,
+      "duration": 3625000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 52500000,
+      "duration": 4125000,
+      "text": "结合"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 56875000,
+      "duration": 3500000,
+      "text": "科学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 60500000,
+      "duration": 4250000,
+      "text": "知识"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 64875000,
+      "duration": 3375000,
+      "text": "作出"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 68375000,
+      "duration": 4500000,
+      "text": "判断"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 78625000,
+      "duration": 4250000,
+      "text": "ABACUS"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 83000000,
+      "duration": 2125000,
+      "text": "LAB"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 88500000,
+      "duration": 3375000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 92000000,
+      "duration": 3875000,
+      "text": "驱动"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 95875000,
+      "duration": 1125000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 97250000,
+      "duration": 3375000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 100750000,
+      "duration": 4750000,
+      "text": "计算与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 106625000,
+      "duration": 3750000,
+      "text": "设计"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 110500000,
+      "duration": 4625000,
+      "text": "平台"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 120750000,
+      "duration": 2125000,
+      "text": "让"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 123000000,
+      "duration": 3500000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 126625000,
+      "duration": 4000000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 130875000,
+      "duration": 2000000,
+      "text": "更"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 132875000,
+      "duration": 4000000,
+      "text": "简单"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 139500000,
+      "duration": 1625000,
+      "text": "把"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 141250000,
+      "duration": 4000000,
+      "text": "更多"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 145375000,
+      "duration": 3625000,
+      "text": "精力"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 151625000,
+      "duration": 3000000,
+      "text": "留给"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 154875000,
+      "duration": 4000000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 159125000,
+      "duration": 1125000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 160375000,
+      "duration": 4125000,
+      "text": "发现"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "key": "mechanical",
+    "id": "jsc2021m000812_WSTF-Mechanical Impact",
+    "collection": "https://images-assets.nasa.gov/video/jsc2021m000812_WSTF-Mechanical%20Impact/collection.json",
+    "download": "https://images-assets.nasa.gov/video/jsc2021m000812_WSTF-Mechanical%20Impact/jsc2021m000812_WSTF-Mechanical%20Impact~medium.mp4",
+    "file": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V18_五分钟_按方案实景重制\\素材\\网络原始素材\\mechanical.mp4",
+    "bytes": 17039550,
+    "ok": true
+  },
+  {
+    "key": "solar",
+    "id": "GRC-2022-CM-0188.13",
+    "collection": "https://images-assets.nasa.gov/video/GRC-2022-CM-0188.13/collection.json",
+    "download": "https://images-assets.nasa.gov/video/GRC-2022-CM-0188.13/GRC-2022-CM-0188.13~medium.mp4",
+    "file": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V18_五分钟_按方案实景重制\\素材\\网络原始素材\\solar.mp4",
+    "bytes": 25175069,
+    "ok": true
+  }
+]

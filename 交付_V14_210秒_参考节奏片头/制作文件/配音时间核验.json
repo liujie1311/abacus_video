@@ -1,0 +1,82 @@
+[
+  {
+    "section": 0,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 1.6,
+    "end": 14.272,
+    "speed_adjust": 0.86,
+    "text": "从微观结构，到材料性能，每一次探索，都需要可靠的计算工具。ABACUSLab，连接材料计算与分析的研究平台。"
+  },
+  {
+    "section": 1,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 15.65,
+    "end": 35.417229166666665,
+    "speed_adjust": 0.86,
+    "text": "面向不同的研究需求，平台汇集多种常用计算模板。从基础计算，到多步骤分析，把计算方法组织成可以复用的流程。让研究有据可循，让新的计算，不必每次都从头准备。"
+  },
+  {
+    "section": 2,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 40.65,
+    "end": 57.576375,
+    "speed_adjust": 0.86,
+    "text": "围绕不同研究目标，按项目组织计算任务。已有方案可以继续使用，也可以调整和复用。让一次次计算积累为清晰的研究过程，让不同任务井然有序。"
+  },
+  {
+    "section": 3,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 60.65,
+    "end": 77.60739583333333,
+    "speed_adjust": 0.86,
+    "text": "统一管理计算任务，实时掌握运行进展，让计算过程清晰可追踪。从整体进度，到关键环节，需要了解的信息集中呈现，帮助研究者及时作出判断。"
+  },
+  {
+    "section": 4,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 80.65,
+    "end": 96.71358333333333,
+    "speed_adjust": 0.86,
+    "text": "结构转换、输入文件准备与参数配置，在工具箱中集中完成。连接不同计算环节，减少反复整理与手工衔接，让准备工作更加顺畅。"
+  },
+  {
+    "section": 5,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 100.65,
+    "end": 115.8540625,
+    "speed_adjust": 0.86,
+    "text": "从态密度到光学响应，多种物性可视化工具，把计算结果转化为直观的图像。观察差异，理解变化，让数据成为继续探索的依据。"
+  },
+  {
+    "section": 6,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 120.65,
+    "end": 141.2411666666667,
+    "speed_adjust": 0.86,
+    "text": "有了完整的平台工具，研究还可以从一句话开始。向 AI 智能体描述你的目标，它能辅助理解需求、梳理计算步骤，并提示需要确认的关键条件。让研究思路，更自然地走向计算方案。"
+  },
+  {
+    "section": 7,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 145.65,
+    "end": 166.844625,
+    "speed_adjust": 0.86,
+    "text": "从组织计算任务，到查看执行进展，再到衔接绘图工具，智能体帮助连接计算与结果展示。把分散的步骤串联起来，让输出数据以图表呈现，也让整个过程可以回到平台中查看和核对。"
+  },
+  {
+    "section": 8,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 170.65,
+    "end": 192.591625,
+    "speed_adjust": 0.86,
+    "text": "面对计算结果，AI 辅助分析图表、归纳主要发现，帮助理解数据中的变化。同时，提示结论的适用范围，并提出下一步验证建议。从提出问题，到看懂结果，让智能协助贯穿研究过程。"
+  },
+  {
+    "section": 9,
+    "male_voice": "zh-CN-YunjianNeural",
+    "start": 195.65,
+    "end": 207.79547916666667,
+    "speed_adjust": 0.86,
+    "text": "从模板与任务管理，到计算分析与智能协助。ABACUSLab，让材料计算更简单，把更多精力，留给研究与发现。"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "name": "01_项目管理",
+    "file": "用户手册历史截图/01_项目管理.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144129243.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "02_项目内任务",
+    "file": "用户手册历史截图/02_项目内任务.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144318250.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "03_模板库",
+    "file": "用户手册历史截图/03_模板库.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144401699.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "04_模板详情",
+    "file": "用户手册历史截图/04_模板详情.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144424743.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "05_工作流列表",
+    "file": "用户手册历史截图/05_工作流列表.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144442673.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "06_工作流详情",
+    "file": "用户手册历史截图/06_工作流详情.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144506390.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "07_任务输出",
+    "file": "用户手册历史截图/07_任务输出.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144513485.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "08_结构转换",
+    "file": "用户手册历史截图/08_结构转换.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144813384.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "09_输入配置",
+    "file": "用户手册历史截图/09_输入配置.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144844969.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "10_能带绘制",
+    "file": "用户手册历史截图/10_能带绘制.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616144925862.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "11_态密度绘制",
+    "file": "用户手册历史截图/11_态密度绘制.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616145135642.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "12_结构展示",
+    "file": "用户手册历史截图/12_结构展示.png",
+    "source": "http://localhost:8080/src/views/manual/使用手册/images/image-20260616145323368.png",
+    "status": "网站手册历史截图；不是本次实时截屏"
+  },
+  {
+    "name": "01_已有首页.png",
+    "file": "已有原始截图/01_已有首页.png",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V10_60秒_去小字_更新平台画面\\03_素材\\原始素材\\新平台首页_用户图三.png",
+    "status": "既有文件复制；不是本次实时截屏"
+  },
+  {
+    "name": "02_已有模板库.png",
+    "file": "已有原始截图/02_已有模板库.png",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V3_含模板_无字幕\\03_图片素材\\03_原始截图\\模板库全景_3450x1701.png",
+    "status": "既有文件复制；不是本次实时截屏"
+  },
+  {
+    "name": "03_已有执行状态.png",
+    "file": "已有原始截图/03_已有执行状态.png",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V6_80秒审看版\\03_素材\\原始素材\\金属熔点_工作流执行状态_原图.png",
+    "status": "既有文件复制；不是本次实时截屏"
+  }
+]

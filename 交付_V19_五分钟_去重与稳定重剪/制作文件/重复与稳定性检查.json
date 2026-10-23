@@ -1,0 +1,63 @@
+{
+  "shots": 41,
+  "duplicate_primary_sources": {},
+  "opening_stability": [
+    {
+      "start": 0,
+      "source": "G01",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 4,
+      "source": "G02",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 7,
+      "source": "G03",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 10,
+      "source": "G04",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 22,
+      "source": "G05",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 25,
+      "source": "G06",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 27.5,
+      "source": "G07",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 30,
+      "source": "G08",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 32,
+      "source": "G09",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 35,
+      "source": "G10",
+      "mean_pixel_change": 0
+    },
+    {
+      "start": 38,
+      "source": "G11",
+      "mean_pixel_change": 0
+    }
+  ],
+  "intentional_secondary_reuse": "111–115 秒为结果入口概览，280–287 秒为明确标识的功能回顾；不重播完整案例段",
+  "source_playback": "30 fps 原录屏各播放一次；短片尾帧停留便于阅读，不慢放复制帧"
+}

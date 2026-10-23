@@ -1,0 +1,15 @@
+{
+  "duration_seconds": 210.00533333333334,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "video_codec": "H.264",
+  "audio_codec": "AAC",
+  "decode_errors": 0,
+  "audio_peak_linear": 0.7352111339569092,
+  "narration_sections": 10,
+  "all_speed_adjustments": 1.0,
+  "shots": 26,
+  "size_mb": 25.0,
+  "transition_noise_sweeps_removed": true,
+  "checks": "Full decode, duration, audio peak, narration boundaries, natural-speed metadata and contact sheet."
+}

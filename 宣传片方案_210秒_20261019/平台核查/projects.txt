@@ -1,0 +1,472 @@
+<template>
+  <section class="project-list-view">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">工作台</h1>
+      </div>
+    </div>
+
+    <div class="project-toolbar">
+      <div class="project-toolbar-actions">
+        <el-input
+          v-model="projectKeyword"
+          :prefix-icon="Search"
+          clearable
+          placeholder="搜索项目名称、ID 或描述"
+          @keyup.enter="reloadProjects"
+        />
+        <el-button type="primary" :icon="Search" @click="reloadProjects">搜索</el-button>
+        <el-button :icon="Refresh" @click="reloadProjects">刷新</el-button>
+        <el-button type="primary" :icon="Plus" @click="openCreateDialog">新建项目</el-button>
+      </div>
+    </div>
+
+    <div class="project-list" v-loading="projectStore.loading">
+      <article
+        v-for="project in projectStore.paginatedProjects"
+        :key="project.id"
+        class="project-row"
+        @click="enterProject(project)"
+      >
+        <span class="project-row-icon">
+          <el-icon><FolderOpened /></el-icon>
+        </span>
+
+        <div class="project-row-main">
+          <div class="project-row-head">
+            <el-tooltip
+              :content="project.name || '未命名项目'"
+              :popper-class="project.name ? 'i18n-skip-popper' : ''"
+              placement="top"
+              :show-after="300"
+            >
+              <h2 :data-i18n-skip="project.name ? true : undefined">{{ project.name || '未命名项目' }}</h2>
+            </el-tooltip>
+          </div>
+
+          <el-tooltip
+            v-if="project.description"
+            :content="project.description"
+            popper-class="i18n-skip-popper"
+            placement="top"
+            :show-after="300"
+          >
+            <p class="project-row-desc" data-i18n-skip>{{ project.description }}</p>
+          </el-tooltip>
+          <p v-else class="project-row-desc muted-desc">暂无描述</p>
+
+          <div class="project-row-meta">
+            <span>
+              <el-icon><Clock /></el-icon>
+              {{ formatDate(project.created_at || project.createdAt) }}
+            </span>
+          </div>
+        </div>
+
+        <div v-if="!isProtectedProject(project)" class="project-row-actions">
+          <el-button type="primary" :icon="Edit" @click.stop="openEditDialog(project)">编辑</el-button>
+          <el-button type="danger" plain :icon="Delete" @click.stop="removeProject(project)">删除</el-button>
+        </div>
+      </article>
+
+      <div v-if="!projectStore.filteredProjects.length" class="empty-block project-empty">
+        {{ projectStore.total ? '没有找到匹配的项目' : '暂无项目' }}
+      </div>
+    </div>
+
+    <div class="pagination-row">
+      <el-pagination
+        background
+        layout="sizes, prev, pager, next, jumper"
+        :current-page="projectStore.currentPage"
+        :page-size="projectStore.pagination.limit"
+        :page-sizes="[20, 50, 100, 200]"
+        :total="projectStore.filteredTotal"
+        @current-change="changeProjectPage"
+        @size-change="changeProjectPageSize"
+      />
+    </div>
+
+    <el-dialog
+      v-model="projectDialog.visible"
+      :title="projectDialog.id ? '编辑项目' : '新建项目'"
+      width="560px"
+      append-to-body
+      destroy-on-close
+    >
+      <el-form label-position="top">
+        <el-form-item label="项目名称" required>
+          <el-input v-model.trim="projectDialog.name" placeholder="例如 Silicon band structure" />
+        </el-form-item>
+        <el-form-item label="项目描述">
+          <el-input
+            v-model.trim="projectDialog.description"
+            type="textarea"
+            :autosize="{ minRows: 4 }"
+            placeholder="说明材料体系、计算目标或任务范围"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="projectDialog.visible = false">取消</el-button>
+        <el-button type="primary" :loading="projectDialog.loading" @click="saveProject">保存</el-button>
+      </template>
+    </el-dialog>
+  </section>
+</template>
+
+<script setup>
+import { computed, onMounted, reactive, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Clock,
+  Delete,
+  Edit,
+  FolderOpened,
+  Plus,
+  Refresh,
+  Search,
+} from '@element-plus/icons-vue'
+
+import { isProtectedProjectId, useProjectStore } from '@/stores/projects'
+import { formatDate } from '@/utils/format'
+
+const router = useRouter()
+const route = useRoute()
+const projectStore = useProjectStore()
+
+const projectKeyword = computed({
+  get: () => projectStore.keyword,
+  set: (value) => projectStore.setKeyword(value),
+})
+
+const projectDialog = reactive({
+  visible: false,
+  loading: false,
+  id: '',
+  name: '',
+  description: '',
+})
+
+function resetDialog(project = null) {
+  projectDialog.id = project?.id || ''
+  projectDialog.name = project?.name || ''
+  projectDialog.description = project?.description || ''
+}
+
+function openCreateDialog() {
+  resetDialog()
+  projectDialog.visible = true
+}
+
+function openCreateDialogFromRoute() {
+  if (String(route.query.create || '') !== '1') {
+    return
+  }
+
+  openCreateDialog()
+  const query = { ...route.query }
+  delete query.create
+  router.replace({
+    path: '/projects',
+    query,
+  })
+}
+
+function openEditDialog(project) {
+  if (isProtectedProject(project)) {
+    ElMessage.warning('公共项目不允许编辑')
+    return
+  }
+
+  resetDialog(project)
+  projectDialog.visible = true
+}
+
+async function saveProject() {
+  if (isProtectedProjectId(projectDialog.id)) {
+    ElMessage.warning('公共项目不允许编辑')
+    return
+  }
+
+  if (!projectDialog.name) {
+    ElMessage.warning('请填写项目名称')
+    return
+  }
+
+  try {
+    projectDialog.loading = true
+    await projectStore.saveProject({
+      name: projectDialog.name,
+      description: projectDialog.description,
+    }, projectDialog.id)
+
+    projectDialog.visible = false
+    ElMessage.success(projectDialog.id ? '项目已更新' : '项目已创建')
+  } catch (error) {
+    if (!error?.response) {
+      ElMessage.error(error.message || '项目保存失败')
+    }
+  } finally {
+    projectDialog.loading = false
+  }
+}
+
+async function removeProject(project) {
+  if (!project?.id) {
+    return
+  }
+
+  if (isProtectedProject(project)) {
+    ElMessage.warning('公共项目不允许删除')
+    return
+  }
+
+  const confirmed = await ElMessageBox.confirm(
+    `确认删除项目「${project.name || project.id}」？关联模板和工作流也会被删除。`,
+    '删除项目',
+    { type: 'warning' },
+  )
+    .then(() => true)
+    .catch(() => false)
+
+  if (!confirmed) {
+    return
+  }
+
+  await projectStore.removeProject(project.id)
+  ElMessage.success('项目已删除')
+}
+
+function isProtectedProject(project) {
+  return isProtectedProjectId(project?.id)
+}
+
+async function reloadProjects() {
+  await projectStore.loadProjects()
+}
+
+function changeProjectPage(page) {
+  projectStore.setPage(page)
+}
+
+function changeProjectPageSize(size) {
+  projectStore.setPageSize(size)
+}
+
+function enterProject(project) {
+  if (!project?.id) {
+    return
+  }
+
+  projectStore.current = project
+  router.push({
+    name: 'project-detail',
+    params: { projectId: project.id },
+  })
+}
+
+onMounted(async () => {
+  await projectStore.loadProjects()
+  openCreateDialogFromRoute()
+})
+
+watch(() => route.query.create, openCreateDialogFromRoute)
+</script>
+
+<style scoped>
+.project-list-view {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 14px;
+  height: calc(var(--design-height, 100vh) - 124px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.project-toolbar,
+.project-row {
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+}
+
+.project-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 14px;
+  border-color: var(--app-border);
+  box-shadow: none;
+}
+
+.project-toolbar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.project-toolbar-actions :deep(.el-input) {
+  flex: 1;
+  min-width: min(100%, 320px);
+}
+
+.project-list {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 2px;
+}
+
+.project-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 112px;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.project-row:hover {
+  border-color: rgba(var(--app-primary-rgb), 0.38);
+  box-shadow: var(--app-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.project-row-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--app-radius);
+  background: var(--app-primary);
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(var(--app-primary-rgb), 0.24);
+}
+
+.project-row-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.project-row-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.project-row-head h2 {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(420px, 34vw);
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-row-desc {
+  max-width: min(980px, 72vw);
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.muted-desc {
+  color: var(--app-text-soft);
+}
+
+.project-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.45;
+}
+
+.project-row-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.project-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 188px;
+}
+
+.project-row-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+.project-empty {
+  min-height: 260px;
+}
+
+@media (max-width: 900px) {
+  .project-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-toolbar-actions {
+    width: 100%;
+  }
+
+  .project-row {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .project-row-head h2,
+  .project-row-desc {
+    max-width: 100%;
+  }
+
+  .project-row-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .project-row {
+    grid-template-columns: 1fr;
+  }
+
+  .project-row-icon {
+    display: none;
+  }
+}
+</style>
+

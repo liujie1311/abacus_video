@@ -1,0 +1,340 @@
+[
+  {
+    "id": "9804656",
+    "title": "Microgravity",
+    "description": "Industry spends billions of dollars each year on machine tools to manufacture products out of metal. This includes tools for cutting every kind of metal part from engine blocks to Shuttle main engine components. Cutting tool tips often break because of weak spots or defects in their composition. Based on a new concept called defect trapping, space offers a novel environment to study defect formation in molten metal materials as they solidify. After the return of these materials from space, researchers can evaluate the source of the defect and seek ways to eliminate them in products prepared on Earth. A widely used process for cutting tip manufacturing is liquid phase sintering. Compared to Earth-sintered samples which slump due to buoyancy induced by gravity, space samples are uniformly shaped and defects remain where they are formed. By studying metals sintered in space the US tool industry can potentially enhance its worldwide competitiveness. The Consortium for Materials Development in Space along with Wyle Labs, Teledyne Advanced Materials, and McDornell Douglas have conducted experiments in space.",
+    "credit": "",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/9804656/9804656~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 1024,
+        "size": 46000,
+        "height": 457
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/9804656/9804656~orig.jpg",
+        "rel": "canonical",
+        "render": "image"
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/9804656/collection.json"
+  },
+  {
+    "id": "iss046e005678",
+    "title": "ACE H2 Hardware Configuration and Mix Part 1",
+    "description": "ISS046e005678 (01/04/2016) ---- ESA (European Space Agency) astronaut Tim Peake works on the Advanced Colloids Experiment 2 (ACE H2) Hardware Configuration and Mix Part 1. Peake sent out a Twitter message with this image: Stirring samples using a bar magnet to turn a tiny metal rod - preparing for today's @ISS_Research. #Principia\".",
+    "credit": "",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/iss046e005678/iss046e005678~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 186000,
+        "height": 852
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/iss046e005678/iss046e005678~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 58000,
+        "height": 426
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/iss046e005678/iss046e005678~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 58000,
+        "height": 426
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/iss046e005678/iss046e005678~large.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1920,
+        "size": 386000,
+        "height": 1279
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/iss046e005678/iss046e005678~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 3292,
+        "width": 4940,
+        "size": 4000000
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/iss046e005678/collection.json"
+  },
+  {
+    "id": "KSC-20221102-PH-KLS01_0089",
+    "title": "Plasma Rapid Oxidation Technique for Extending Component Tenabil",
+    "description": "Gerard Moscoso, a mechanical engineer technician with NASA, prepares a sample for testing for the  Plasma Rapid Oxidation Technique for Extending Component Tenability (PROTECT) project inside the Prototype Development Laboratory at NASA’s Kennedy Space Center in Florida on Nov. 2, 2022. Plasma electrolytic oxidation is a surface coating technology that produces oxide layers on the surface of light metals and their alloys to improve their performance characteristics. These coatings are tailored to provide a combination of characteristics such as corrosion protection, wear resistance, thermal management, extreme hardness, and fatigue performance. PROTECT is expected to demonstrate a 10 percent improved fatigue performance and a 70 percent improvement in corrosion characteristics on the interior of treated 3-D printed metallic parts when compared to non-treated parts. PROTECT could be applied on spacecraft and launch vehicles. ",
+    "credit": "",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/KSC-20221102-PH-KLS01_0089~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 105000,
+        "height": 853
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/KSC-20221102-PH-KLS01_0089~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 37000,
+        "height": 426
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/KSC-20221102-PH-KLS01_0089~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 37000,
+        "height": 426
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/KSC-20221102-PH-KLS01_0089~large.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1920,
+        "size": 227000,
+        "height": 1280
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/KSC-20221102-PH-KLS01_0089~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 4480,
+        "width": 6720,
+        "size": 23068672
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0089/collection.json"
+  },
+  {
+    "id": "KSC-20221102-PH-KLS01_0085",
+    "title": "Plasma Rapid Oxidation Technique for Extending Component Tenabil",
+    "description": "Gerard Moscoso, a mechanical engineer technician with NASA, handles a sample that is being prepared for fatigue and corrosion testing for the Plasma Rapid Oxidation Technique for Extending Component Tenability (PROTECT) project inside the Prototype Development Laboratory at NASA’s Kennedy Space Center in Florida on Nov. 2, 2022. Plasma electrolytic oxidation is a surface coating technology that produces oxide layers on the surface of light metals and their alloys to improve their performance characteristics. These coatings are tailored to provide a combination of characteristics such as corrosion protection, wear resistance, thermal management, extreme hardness, and fatigue performance. PROTECT is expected to demonstrate a ten percent improved fatigue performance and a 70 percent improvement in corrosion characteristics on the interior of treated 3-D printed metallic parts when compared to non-treated parts. PROTECT could be applied on spacecraft and launch vehicles. ",
+    "credit": "",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/KSC-20221102-PH-KLS01_0085~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 853,
+        "size": 148000,
+        "height": 1280
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/KSC-20221102-PH-KLS01_0085~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 426,
+        "size": 50000,
+        "height": 640
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/KSC-20221102-PH-KLS01_0085~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 426,
+        "size": 50000,
+        "height": 640
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/KSC-20221102-PH-KLS01_0085~large.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 283000,
+        "height": 1920
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/KSC-20221102-PH-KLS01_0085~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 6720,
+        "width": 4480,
+        "size": 23068672
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/KSC-20221102-PH-KLS01_0085/collection.json"
+  },
+  {
+    "id": "PIA25588",
+    "title": "Perseverance's CacheCam Views a Regolith Sample",
+    "description": "This image of Martian regolith – broken rock and dust – was captured Dec. 2, 2022, by the Sampling and Caching System Camera (known as CacheCam) on NASA's Perseverance Mars rover. The regolith, contained inside a metal tube, is one of two samples that will be considered for deposit on the Martian surface this month as part of the Mars Sample Return campaign.  The sample was collected in Mars' Jezero Crater from a pile of wind-blown sand and dust called a \"mega-ripple\" – a feature similar to but smaller than a dune.  Studying regolith with powerful lab equipment back on Earth will allow scientists to better understand the processes that have shaped the surface of Mars and help engineers design future missions as well as equipment used by future Martian astronauts.  A key objective for Perseverance's mission on Mars is astrobiology, including the search for signs of ancient microbial life. The rover will characterize the planet's geology and past climate, pave the way for human exploration of the Red Planet, and be the first mission to collect and cache Martian rock and regolith.  Subsequent NASA missions, in cooperation with ESA (European Space Agency), would send spacecraft to Mars to collect these sealed samples from the surface and return them to Earth for in-depth analysis.  The Mars 2020 Perseverance mission is part of NASA's Moon to Mars exploration approach, which includes Artemis missions to the Moon that will help prepare for human exploration of the Red Planet.  https://photojournal.jpl.nasa.gov/catalog/PIA25588",
+    "credit": "NASA/JPL-Caltech",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA25588/PIA25588~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 49000,
+        "height": 960
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA25588/PIA25588~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 17000,
+        "height": 480
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA25588/PIA25588~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 17000,
+        "height": 480
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA25588/PIA25588~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 960,
+        "width": 1280,
+        "size": 49152
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/PIA25588/collection.json"
+  },
+  {
+    "id": "PIA24806",
+    "title": "Perseverance's First Cored Mars Rock in Sample Tube",
+    "description": "The first cored sample of Mars rock is visible (at center) inside a titanium sample collection tube in this from the Sampling and Caching System Camera (known as CacheCam) of NASA's Perseverance rover. The image was taken on Sept. 6, 2021 (the 194th sol, or Martian day, of the mission), prior to the system attaching and sealing a metal cap onto the tube.  The image was taken so the cored-rock sample would be in focus. The seemingly dark ring surrounding the sample is a portion of the sample tube's inner wall. The bright gold-colored ring surrounding the tube and sample is the \"bearing race,\" an asymmetrical flange that assists in shearing off a sample once the coring drill has bored into a rock. The outermost, mottled-brown disc in this image is a portion of the sample handling arm inside the rover's adaptive caching assembly.  An additional set of images shows the tube and its cored sample during CacheCam imaging inspection.  A key objective for Perseverance's mission on Mars is astrobiology, including the search for signs of ancient microbial life. The rover will characterize the planet's geology and past climate, pave the way for human exploration of the Red Planet, and be the first mission to collect and cache Martian rock and regolith (broken rock and dust).  Subsequent NASA missions, in cooperation with ESA (European Space Agency), would send spacecraft to Mars to collect these sealed samples from the surface and return them to Earth for in-depth analysis.  The Mars 2020 Perseverance mission is part of NASA's Moon to Mars exploration approach, which includes Artemis missions to the Moon that will help prepare for human exploration of the Red Planet.  Movie available at https://photojournal.jpl.nasa.gov/catalog/PIA24806",
+    "credit": "NASA/JPL-Caltech",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA24806/PIA24806~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 49000,
+        "height": 960
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA24806/PIA24806~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 17000,
+        "height": 480
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA24806/PIA24806~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 17000,
+        "height": 480
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA24806/PIA24806~large.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1920,
+        "size": 96000,
+        "height": 1440
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA24806/PIA24806~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 1620,
+        "width": 2160,
+        "size": 112000
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/PIA24806/collection.json"
+  },
+  {
+    "id": "PIA26162",
+    "title": "NASA's COLDArm in Thermal Vacuum Testing",
+    "description": "Engineers and technicians prepare NASA's Cold Operable Lunar Deployable Arm (COLDArm) robotic arm system for testing in a thermal vacuum chamber at the agency's Jet Propulsion Laboratory in Southern California in November 2023.  Successful testing in this chamber, which was reduced to minus 292 F (minus 180 C), demonstrates the arm can withstand the conditions it would face on the surface of the Moon.  To operate in the cold, COLDArm combines several key new technologies: gears made of bulk metallic glass, which require no wet lubrication or heating; cold motor controllers that don't need to be kept warm in an electronics box near the core of the spacecraft, and a cryogenic six-axis force torque sensor that lets the arm \"feel\" what it's doing and make adjustments.  A variety of attachments and small instruments could go on the end of the arm, including a 3D-printed titanium scoop that could be used for collecting samples from a celestial body's surface. Like the arm on NASA's InSight Mars lander, COLDArm could deploy science instruments to the surface.  https://photojournal.jpl.nasa.gov/catalog/PIA26162",
+    "credit": "NASA/JPL-Caltech",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA26162/PIA26162~medium.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1280,
+        "size": 157000,
+        "height": 959
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA26162/PIA26162~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 48000,
+        "height": 479
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA26162/PIA26162~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 48000,
+        "height": 479
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA26162/PIA26162~large.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 1920,
+        "size": 315000,
+        "height": 1439
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/PIA26162/PIA26162~orig.jpg",
+        "rel": "canonical",
+        "render": "image",
+        "height": 6200,
+        "width": 8272,
+        "size": 8178892
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/PIA26162/collection.json"
+  },
+  {
+    "id": "0101822",
+    "title": "Microgravity",
+    "description": "Biotechnology Specimen Temperature Controller (BSTC) will cultivate cells until their turn in the bioreactor; it can also be used in culturing experiments that do not require the bioreactor. The BSTC comprises four incubation/refrigeration chambers individually set at 4 to 50 deg. C (near-freezing to above body temperature). Each chamber holds three rugged tissue chamber modules (12 total), clear Teflon bags holding 30 ml of growth media, all positioned by a metal frame. Every 7 to 21 days (depending on growth rates), an astronaut uses a shrouded syringe and the bags' needleless injection ports to transfer a few cells to a fresh media bag, and to introduce a fixative so that the cells may be studied after flight. The design also lets the crew sample the media to measure glucose, gas, and pH levels, and to inspect cells with a microscope. The controller is monitored by the flight crew through a 23-cm (9-inch) color computer display on the face of the BSTC. This view shows the BTSC with the front panel open. The work is sponsored by NASA's Office of Biological and Physical Research. The bioreactor is managed by the Biotechnology Cell Science Program at NASA's Johnson Space Center (JSC). NASA-sponsored bioreactor research has been instrumental in helping scientists to better understand normal and cancerous tissue development. In cooperation with the medical community, the bioreactor design is being used to prepare better models of human colon, prostate, breast and ovarian tumors. Cartilage, bone marrow, heart muscle, skeletal muscle, pancreatic islet cells, liver and kidney are just a few of the normal tissues being cultured in rotating bioreactors by investigators.",
+    "credit": "",
+    "links": [
+      {
+        "href": "https://images-assets.nasa.gov/image/0101822/0101822~small.jpg",
+        "rel": "alternate",
+        "render": "image",
+        "width": 640,
+        "size": 40000,
+        "height": 440
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/0101822/0101822~thumb.jpg",
+        "rel": "preview",
+        "render": "image",
+        "width": 640,
+        "size": 40000,
+        "height": 440
+      },
+      {
+        "href": "https://images-assets.nasa.gov/image/0101822/0101822~orig.jpg",
+        "rel": "canonical",
+        "render": "image"
+      }
+    ],
+    "collection": "https://images-assets.nasa.gov/image/0101822/collection.json"
+  }
+]

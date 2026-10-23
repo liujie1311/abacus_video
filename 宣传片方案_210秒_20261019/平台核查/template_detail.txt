@@ -1,0 +1,1289 @@
+<template>
+  <div class="template-detail-page" v-loading="templateStore.detailLoading">
+    <template v-if="template">
+      <section class="detail-hero" :class="`type-${getTemplateTypeKey(template.definition)}`">
+        <div class="detail-hero-main">
+          <div class="detail-cover" :class="`type-${getTemplateTypeKey(template.definition)}`">
+            <img v-if="getTemplateCover(template).src" :src="getTemplateCover(template).src" :alt="getTemplateCover(template).alt" />
+          </div>
+          <div class="detail-copy">
+            <div class="detail-kicker">ID {{ template.id }}</div>
+            <h1 :data-i18n-skip="template.name ? true : undefined">{{ template.name || '未命名模板' }}</h1>
+            <p :data-i18n-skip="template.description ? true : undefined">{{ template.description || '暂无描述' }}</p>
+            <div class="detail-meta">
+              <span>
+                <el-icon><Folder /></el-icon>
+                <span :data-i18n-skip="translateKnown(template.category || '未分类') === (template.category || '未分类') ? true : undefined">
+                  {{ translateKnown(template.category || '未分类') }}
+                </span>
+              </span>
+              <span>
+                <el-icon><Clock /></el-icon>
+                {{ formatDate(template.updated_at) || '-' }}
+              </span>
+              <span>
+                <el-icon><List /></el-icon>
+                {{ currentWorkflowSteps.length }} 个步骤
+              </span>
+            </div>
+            <div v-if="template.tags?.length" class="detail-tags">
+              <el-tag v-for="tag in getTemplateTags(template)" :key="tag" size="large" effect="plain">
+                <span :data-i18n-skip="translateKnown(tag) === tag ? true : undefined">
+                  {{ translateKnown(tag) }}
+                </span>
+              </el-tag>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="detail-layout">
+        <main class="detail-main">
+          <section class="detail-section">
+            <div class="section-bar">
+              <div>
+                <h2>工作流步骤</h2>
+                <p>按执行顺序展示 Step、类型和依赖关系。</p>
+              </div>
+              <el-tag effect="plain">{{ currentWorkflowSteps.length }} 个步骤</el-tag>
+            </div>
+
+            <div v-if="currentWorkflowSteps.length" class="workflow-diagram">
+              <div class="workflow-diagram-canvas">
+                <div class="workflow-graph-column">
+                  <template v-for="(step, index) in currentWorkflowSteps" :key="`${step.id}-${index}`">
+                    <button
+                      type="button"
+                      class="workflow-graph-node"
+                      :class="`type-${normalizeStepType(step.type)}`"
+                      @click="openStepDetailDrawer(step)"
+                    >
+                      <strong>{{ step.id }}</strong>
+                      <small>{{ getWorkflowTypeLabel(normalizeStepType(step.type)) }}</small>
+                      <span v-if="step.dependencies !== '-'" class="workflow-node-dependency">
+                        depends on {{ step.dependencies }}
+                      </span>
+                      <span v-if="step.workdir !== '-'" class="workflow-node-workdir">
+                        workdir {{ step.workdir }}
+                      </span>
+                    </button>
+                    <div v-if="index < currentWorkflowSteps.length - 1" class="workflow-graph-arrow" aria-hidden="true">
+                      <span></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-block compact">暂无步骤定义</div>
+          </section>
+
+          <section class="detail-section">
+            <div class="section-bar">
+              <div>
+                <h2>引用变量</h2>
+                <p>模板执行时传入的默认参数。</p>
+              </div>
+            </div>
+            <DataPreview
+              :value="getTemplateParameters(template)"
+              yaml-only
+              collapsible
+              default-collapsed
+              title="预览"
+              empty-text="No parameters configured."
+            />
+          </section>
+
+          <section class="detail-section">
+            <div class="section-bar">
+              <div>
+                <h2>工作流定义</h2>
+                <p>YAML 用于复制和核对。</p>
+              </div>
+            </div>
+            <DataPreview
+              :value="template.definition || {}"
+              yaml-only
+              format-toggle
+              collapsible
+              default-collapsed
+              title="预览"
+              empty-text="No workflow definition configured."
+            />
+          </section>
+        </main>
+
+        <aside class="detail-sidebar">
+          <section class="detail-section compact-section">
+            <h2>基础信息</h2>
+            <dl class="info-list">
+              <div>
+                <dt>类型</dt>
+                <dd>{{ getTemplateTypeLabel(template.definition) }}</dd>
+              </div>
+              <div>
+                <dt>分类</dt>
+                <dd :data-i18n-skip="translateKnown(template.category || '-') === (template.category || '-') ? true : undefined">
+                  {{ translateKnown(template.category || '-') }}
+                </dd>
+              </div>
+              <div>
+                <dt>步骤数</dt>
+                <dd>{{ currentWorkflowSteps.length }}</dd>
+              </div>
+              <div>
+                <dt>更新时间</dt>
+                <dd>{{ formatDate(template.updated_at) || '-' }}</dd>
+              </div>
+            </dl>
+          </section>
+
+        </aside>
+      </div>
+    </template>
+
+    <div v-else-if="!templateStore.detailLoading" class="empty-block">未找到模板</div>
+
+    <el-drawer
+      v-model="stepDetailDrawer.visible"
+      :title="selectedStepTitle"
+      size="720px"
+      class="workflow-step-drawer"
+      append-to-body
+      destroy-on-close
+    >
+      <div v-if="selectedStep" class="step-detail-content">
+        <div class="step-detail-summary">
+          <div class="step-detail-summary-head">
+            <div>
+              <h3>{{ selectedStep.id }}</h3>
+              <p>{{ getWorkflowTypeLabel(normalizeStepType(selectedStep.type)) }} 步骤</p>
+            </div>
+            <el-tag effect="plain">{{ getWorkflowTypeLabel(normalizeStepType(selectedStep.type)) }}</el-tag>
+          </div>
+
+          <h4>步骤说明</h4>
+          <p>{{ getStepDescription(selectedStep) }}</p>
+
+          <dl class="step-detail-meta">
+            <div>
+              <dt>依赖</dt>
+              <dd>{{ selectedStep.dependencies }}</dd>
+            </div>
+            <div>
+              <dt>工作目录</dt>
+              <dd>{{ selectedStep.workdir }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <section
+          v-for="section in selectedStepSections"
+          :key="section.key"
+          class="step-config-section"
+        >
+          <div class="step-config-head">
+            <div>
+              <h3>{{ section.title }}</h3>
+              <p v-if="section.description">{{ section.description }}</p>
+            </div>
+            <el-tag v-if="section.badge" effect="plain">{{ section.badge }}</el-tag>
+          </div>
+
+          <pre v-if="section.content" class="step-readonly-code">{{ section.content }}</pre>
+          <div v-else class="empty-block compact">{{ section.emptyText }}</div>
+        </section>
+      </div>
+    </el-drawer>
+
+  </div>
+</template>
+
+<script setup>
+import { computed, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import {
+  Clock,
+  Folder,
+  List,
+} from '@element-plus/icons-vue'
+
+import { useTemplateStore } from '@/stores/templates'
+import { translateKnownText } from '@/i18n'
+import { useAppStore } from '@/stores/app'
+import { formatDate } from '@/utils/format'
+import abacusCoverLogo from '@/assets/logos/abacus-logo.svg'
+import abacusTb2jCover from '@/assets/logos/abacus+TB2J.jpeg'
+import lammpsLogo from '@/assets/logos/lammps-logo.png'
+import pyatbLogoCropped from '@/assets/logos/pyatb-logo-cropped.jpg'
+import scriptCoverLogo from '@/assets/logos/script-display-fill.png'
+import mixedWorkflowCover from '@/assets/logos/mixed-logo.png'
+import DataPreview from './components/DataPreview.vue'
+
+const route = useRoute()
+const appStore = useAppStore()
+const templateStore = useTemplateStore()
+
+const stepDetailDrawer = reactive({
+  visible: false,
+})
+const selectedStep = ref(null)
+
+const workflowTypeLabels = {
+  abacus: 'ABACUS',
+  lammps: 'LAMMPS',
+  tb2j: 'TB2J',
+  pyatb: 'PYATB',
+  script: 'Script',
+}
+
+const templateCoverImages = {
+  abacus: {
+    src: abacusCoverLogo,
+    alt: 'ABACUS 模板封面',
+  },
+  pyatb: {
+    src: pyatbLogoCropped,
+    alt: 'PYATB 模板封面',
+  },
+  lammps: {
+    src: lammpsLogo,
+    alt: 'LAMMPS 模板封面',
+  },
+  tb2j: {
+    src: scriptCoverLogo,
+    alt: 'TB2J 模板封面',
+  },
+  script: {
+    src: scriptCoverLogo,
+    alt: 'Script 模板封面',
+  },
+  mixed: {
+    src: mixedWorkflowCover,
+    alt: '组合工作流模板封面',
+  },
+  mixedAbacusTb2j: {
+    src: abacusTb2jCover,
+    alt: 'ABACUS + TB2J 模板封面',
+  },
+}
+
+const templateId = computed(() => String(route.params.templateId || ''))
+const template = computed(() => (
+  String(templateStore.current?.id || '') === templateId.value ? templateStore.current : null
+))
+const currentWorkflowSteps = computed(() => {
+  const steps = template.value?.definition?.steps
+
+  if (!Array.isArray(steps)) {
+    return []
+  }
+
+  return steps.map((step) => ({
+    id: step.id || step.step_id || '-',
+    type: step.type || '-',
+    description: step.description || '',
+    workdir: formatStepWorkdir(step),
+    dependencies: formatDependencies(step),
+    raw: step,
+  }))
+})
+const selectedStepTitle = computed(() => (selectedStep.value?.id ? `步骤详情：${selectedStep.value.id}` : '步骤详情'))
+const selectedStepSections = computed(() => (selectedStep.value ? buildStepDetailSections(selectedStep.value) : []))
+
+async function loadTemplate() {
+  if (!templateId.value) {
+    return
+  }
+
+  try {
+    await templateStore.selectTemplate(templateId.value)
+  } catch (error) {
+    if (!error?.response) {
+      ElMessage.error(error.message || '模板加载失败')
+    }
+  }
+}
+
+function getTemplateTypeLabel(definition) {
+  const types = resolveWorkflowTypes(definition)
+
+  if (!types.length) {
+    return '未知'
+  }
+
+  if (types.length === 1) {
+    return getWorkflowTypeLabel(types[0])
+  }
+
+  return types.map((type) => getWorkflowTypeLabel(type)).join(' + ')
+}
+
+function getTemplateTypeKey(definition) {
+  const types = resolveWorkflowTypes(definition)
+  return types.length > 1 ? 'mixed' : types[0] || 'abacus'
+}
+
+function getTemplateTags(sourceTemplate) {
+  return Array.isArray(sourceTemplate?.tags) ? sourceTemplate.tags : []
+}
+
+function translateKnown(value) {
+  return translateKnownText(value, appStore.language)
+}
+
+function getTemplateCover(sourceTemplate) {
+  const key = getTemplateCoverKey(sourceTemplate?.definition)
+
+  return templateCoverImages[key] || templateCoverImages.abacus
+}
+
+function getTemplateCoverKey(definition) {
+  const types = resolveWorkflowTypes(definition)
+
+  if (types.length === 2 && types.includes('abacus') && types.includes('tb2j')) {
+    return 'mixedAbacusTb2j'
+  }
+
+  return getTemplateTypeKey(definition)
+}
+
+function getTemplateParameters(sourceTemplate) {
+  return isPlainRecord(sourceTemplate?.parameters) ? sourceTemplate.parameters : {}
+}
+
+function getWorkflowTypeLabel(type) {
+  return workflowTypeLabels[type] || '未知'
+}
+
+function openStepDetailDrawer(step) {
+  selectedStep.value = step
+  stepDetailDrawer.visible = true
+}
+
+function getStepDescription(step) {
+  const description = String(step?.description || step?.raw?.description || '').trim()
+
+  if (description) {
+    return description
+  }
+
+  return normalizeStepType(step?.type) === 'script' ? 'Run script commands' : 'Prepare input files'
+}
+
+function getStepConfig(step) {
+  return isPlainRecord(step?.raw?.config) ? step.raw.config : {}
+}
+
+function buildStepDetailSections(step) {
+  const type = normalizeStepType(step.type)
+  const config = getStepConfig(step)
+  const sections = []
+
+  if (type === 'abacus') {
+    sections.push({
+      key: 'input',
+      title: 'INPUT 参数',
+      description: 'ABACUS 计算输入参数。',
+      content: formatInputContent(config.INPUT),
+      emptyText: '暂无 INPUT 参数',
+    })
+    sections.push({
+      key: 'kpt',
+      title: 'KPT 配置',
+      description: 'K 点采样设置。',
+      content: formatConfigContent(config.KPT),
+      emptyText: '暂无 KPT 配置',
+    })
+    sections.push({
+      key: 'stru',
+      title: 'STRU 内容',
+      description: '结构文件内容。',
+      content: formatConfigContent(config.STRU),
+      emptyText: '暂无 STRU 内容',
+    })
+  } else if (type === 'lammps') {
+    sections.push({
+      key: 'input',
+      title: '参数配置',
+      description: 'LAMMPS INPUT 内容。',
+      content: formatConfigContent(config.INPUT),
+      emptyText: '暂无 INPUT 内容',
+    })
+    sections.push({
+      key: 'stru',
+      title: 'STRU 内容',
+      description: 'LAMMPS data 文件内容。',
+      content: formatConfigContent(config.STRU ?? config.stru),
+      emptyText: '暂无 STRU 内容',
+    })
+  } else if (type === 'tb2j') {
+    sections.push({
+      key: 'parameter',
+      title: 'TB2J 参数',
+      description: 'TB2J 磁交换参数配置。',
+      content: formatConfigContent(config.parameter),
+      emptyText: '暂无 TB2J 参数',
+    })
+  } else if (type === 'pyatb') {
+    sections.push({
+      key: 'input',
+      title: 'PYATB Input',
+      description: 'PYATB 后处理输入内容。',
+      content: formatConfigContent(config.Input ?? config.INPUT),
+      emptyText: '暂无 PYATB Input 内容',
+    })
+    sections.push({
+      key: 'stru',
+      title: 'STRU 内容',
+      description: '该步骤关联的结构文件内容。',
+      content: formatConfigContent(config.STRU ?? config.stru),
+      emptyText: '暂无 STRU 内容',
+    })
+  } else if (type === 'script') {
+    sections.push({
+      key: 'script',
+      title: '脚本内容',
+      description: '该步骤执行的脚本。',
+      content: formatConfigContent(config.script),
+      badge: config.interpreter || 'script',
+      emptyText: '暂无脚本内容',
+    })
+  }
+
+  const commonRows = configToRows(pickCommonStepConfig(config))
+
+  if (commonRows.length) {
+    sections.push({
+      key: 'common',
+      title: '执行配置',
+      description: '命令、环境变量、文件和输出等附加配置。',
+      content: formatRowsAsBlock(commonRows),
+      emptyText: '暂无执行配置',
+    })
+  }
+
+  const stepRows = configToRows(pickStepLevelConfig(step))
+
+  if (stepRows.length) {
+    sections.push({
+      key: 'step',
+      title: '步骤控制',
+      description: 'parameters、foreach 等步骤级配置。',
+      content: formatRowsAsBlock(stepRows),
+      emptyText: '暂无步骤控制配置',
+    })
+  }
+
+  const extraRows = configToRows(getExtraStepConfig(config, type))
+
+  if (extraRows.length) {
+    sections.push({
+      key: 'extra',
+      title: '其他配置',
+      description: '模板中额外声明的步骤配置。',
+      content: formatRowsAsBlock(extraRows),
+      emptyText: '暂无其他配置',
+    })
+  }
+
+  return sections
+}
+
+function pickCommonStepConfig(config) {
+  if (!isPlainRecord(config)) {
+    return {}
+  }
+
+  return Object.fromEntries(
+    ['command', 'env', 'files', 'outputs', 'dry_run', 'input_mode'].filter((key) => config[key] !== undefined).map((key) => [key, config[key]]),
+  )
+}
+
+function pickStepLevelConfig(step) {
+  if (!isPlainRecord(step)) {
+    return {}
+  }
+
+  return Object.fromEntries(
+    ['parameters', 'foreach'].filter((key) => step[key] !== undefined).map((key) => [key, step[key]]),
+  )
+}
+
+function getExtraStepConfig(config, type) {
+  if (!isPlainRecord(config)) {
+    return {}
+  }
+
+  const knownKeys = getKnownStepConfigKeys(type)
+
+  return Object.fromEntries(
+    Object.entries(config).filter(([key]) => !knownKeys.has(key)),
+  )
+}
+
+function getKnownStepConfigKeys(type) {
+  const sharedKeys = ['command', 'env', 'files', 'outputs', 'workdir', 'workDir', 'work_dir', 'working_directory']
+  const typeKeys = {
+    abacus: ['INPUT', 'KPT', 'STRU', 'dry_run', 'input_mode'],
+    lammps: ['INPUT', 'STRU', 'stru'],
+    tb2j: ['parameter'],
+    pyatb: ['Input', 'INPUT', 'STRU', 'stru'],
+    script: ['interpreter', 'script'],
+  }
+
+  return new Set([...sharedKeys, ...(typeKeys[normalizeStepType(type)] || [])])
+}
+
+function configToRows(value) {
+  if (!isPlainRecord(value)) {
+    return []
+  }
+
+  return Object.entries(value).map(([key, item]) => ({
+    key,
+    value: formatDisplayValue(item),
+  }))
+}
+
+function formatInputContent(value) {
+  if (isPlainRecord(value)) {
+    const rows = configToRows(value)
+
+    if (!rows.length) {
+      return ''
+    }
+
+    const maxKeyLength = Math.max(...rows.map((row) => row.key.length))
+    return ['INPUT_PARAMETERS', ...rows.map((row) => `${row.key}${' '.repeat(maxKeyLength - row.key.length + 2)}${row.value}`)].join('\n')
+  }
+
+  if (typeof value === 'string') {
+    return value.trim()
+  }
+
+  return formatConfigContent(value)
+}
+
+function formatRowsAsBlock(rows = []) {
+  if (!rows.length) {
+    return ''
+  }
+
+  const maxKeyLength = Math.max(...rows.map((row) => row.key.length))
+  return rows.map((row) => `${row.key}${' '.repeat(maxKeyLength - row.key.length + 2)}${row.value}`).join('\n')
+}
+
+function formatConfigContent(value) {
+  if (value === undefined || value === null) {
+    return ''
+  }
+
+  if (typeof value === 'string') {
+    return value.trim()
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => formatDisplayValue(item)).join('\n')
+  }
+
+  if (isPlainRecord(value)) {
+    const struText = formatStruConfig(value)
+
+    if (struText) {
+      return struText
+    }
+
+    return configToRows(value)
+      .map((row) => `${row.key}: ${row.value}`)
+      .join('\n')
+  }
+
+  return String(value)
+}
+
+function formatStruConfig(value) {
+  if (!isPlainRecord(value)) {
+    return ''
+  }
+
+  const atomSpecies = Array.isArray(value.atom_species) ? value.atom_species : []
+  const atomPositions = Array.isArray(value.atom_positions) ? value.atom_positions : []
+  const latticeVectors = Array.isArray(value.lattice_vectors)
+    ? value.lattice_vectors
+    : Array.isArray(value.lattice_vector)
+      ? value.lattice_vector
+      : []
+
+  if (!atomSpecies.length && !atomPositions.length && !latticeVectors.length && value.lattice_constant === undefined) {
+    return ''
+  }
+
+  const lines = []
+
+  if (atomSpecies.length) {
+    lines.push('ATOMIC_SPECIES')
+    atomSpecies.forEach((species) => {
+      const element = species.element || species.type || species.name || ''
+      const mass = species.mass ?? species.atomic_mass ?? ''
+      const pp = species.pseudopotential || species.pp || species.pp_file || species.pseudo || ''
+      lines.push([element, mass, pp].map((item) => formatInlineValue(item)).filter(Boolean).join(' '))
+    })
+    lines.push('')
+
+    const orbitalLines = atomSpecies
+      .map((species) => species.orbital || species.basis || species.numerical_orbital)
+      .filter(Boolean)
+
+    if (orbitalLines.length) {
+      lines.push('NUMERICAL_ORBITAL')
+      lines.push(...orbitalLines.map((item) => formatInlineValue(item)))
+      lines.push('')
+    }
+  }
+
+  if (value.lattice_constant !== undefined) {
+    lines.push('LATTICE_CONSTANT')
+    lines.push(formatInlineValue(value.lattice_constant))
+    lines.push('')
+  }
+
+  if (latticeVectors.length) {
+    lines.push('LATTICE_VECTORS')
+    latticeVectors.forEach((vector) => lines.push(formatInlineValue(vector)))
+    lines.push('')
+  }
+
+  if (atomPositions.length) {
+    lines.push('ATOMIC_POSITIONS')
+    lines.push(formatCoordinateType(value.coordinate_type || value.coord_type || value.type || 'Direct'))
+    atomPositions.forEach((atom) => lines.push(formatAtomPosition(atom)))
+  }
+
+  return lines.join('\n').trim()
+}
+
+function formatAtomPosition(atom) {
+  if (!isPlainRecord(atom)) {
+    return formatInlineValue(atom)
+  }
+
+  const element = atom.element || atom.type || atom.name || ''
+  const position = atom.position || atom.positions || atom.coordinate || atom.coordinates || atom.value || []
+  const tail = [atom.magmom, atom.velocity, atom.constraint].filter((item) => item !== undefined).map((item) => formatInlineValue(item))
+
+  return [element, formatInlineValue(position), ...tail].filter(Boolean).join(' ')
+}
+
+function formatCoordinateType(value) {
+  const text = String(value || 'Direct').trim()
+  const lowerText = text.toLowerCase()
+
+  if (lowerText.startsWith('direct')) {
+    return 'Direct'
+  }
+
+  if (lowerText.startsWith('cart')) {
+    return 'Cartesian'
+  }
+
+  return text
+}
+
+function formatInlineValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => formatInlineValue(item)).join(' ')
+  }
+
+  if (isPlainRecord(value)) {
+    return JSON.stringify(value)
+  }
+
+  return String(value ?? '').trim()
+}
+
+function formatDisplayValue(value) {
+  if (value === undefined || value === null) {
+    return '-'
+  }
+
+  if (typeof value === 'string') {
+    return value.trim() || '-'
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => formatDisplayValue(item)).join(', ')
+  }
+
+  if (isPlainRecord(value)) {
+    return JSON.stringify(value)
+  }
+
+  return String(value)
+}
+
+function normalizeStepType(type) {
+  return Object.prototype.hasOwnProperty.call(workflowTypeLabels, type) ? type : 'abacus'
+}
+
+function resolveWorkflowTypes(definition) {
+  const steps = Array.isArray(definition?.steps) ? definition.steps : []
+  const types = steps.map((step) => step?.type).filter((type) => Object.prototype.hasOwnProperty.call(workflowTypeLabels, type))
+
+  return [...new Set(types)]
+}
+
+function formatDependencies(step) {
+  const dependencies = getStepDependencies(step)
+  return dependencies.length ? dependencies.join(', ') : '-'
+}
+
+function formatStepWorkdir(step) {
+  const workdir = String(
+    step?.workdir ??
+    step?.workDir ??
+    step?.work_dir ??
+    step?.working_directory ??
+    step?.config?.workdir ??
+    step?.config?.workDir ??
+    step?.config?.work_dir ??
+    step?.config?.working_directory ??
+    '',
+  ).trim()
+  return workdir || '-'
+}
+
+function getStepDependencies(step) {
+  const value = step?.depends_on ?? step?.dependencies ?? step?.dependsOn
+
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '').trim()).filter(Boolean)
+  }
+
+  if (typeof value === 'string') {
+    return value.split(',').map((item) => item.trim()).filter(Boolean)
+  }
+
+  return []
+}
+
+function isPlainRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+watch(templateId, loadTemplate, { immediate: true })
+</script>
+
+<style scoped>
+.template-detail-page {
+  display: grid;
+  gap: 18px;
+  min-height: 0;
+}
+
+.detail-hero {
+  --template-type-color: var(--app-primary);
+  --template-type-soft: var(--app-primary-soft);
+  --template-type-border: var(--el-color-primary-light-7);
+
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--template-type-border);
+  border-radius: var(--app-radius);
+  background: var(--template-type-soft);
+}
+
+.detail-hero.type-pyatb {
+  --template-type-color: var(--app-warning);
+  --template-type-soft: var(--app-warning-soft);
+  --template-type-border: var(--app-warning-border);
+}
+
+.detail-hero.type-lammps {
+  --template-type-color: var(--app-info);
+  --template-type-soft: var(--app-info-soft);
+  --template-type-border: var(--app-info-border);
+}
+
+.detail-hero.type-script {
+  --template-type-color: var(--app-info);
+  --template-type-soft: var(--app-info-soft);
+  --template-type-border: var(--app-info-border);
+}
+
+.detail-hero.type-mixed {
+  --template-type-color: var(--app-success);
+  --template-type-soft: var(--app-success-soft);
+  --template-type-border: var(--app-success-border);
+}
+
+.detail-hero-main {
+  display: grid;
+  grid-template-columns: minmax(190px, 280px) minmax(0, 1fr);
+  gap: 24px;
+  min-width: 0;
+}
+
+.detail-cover {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  overflow: hidden;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: #fff;
+}
+
+.detail-cover img {
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+}
+
+.detail-copy {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding-right: 104px;
+}
+
+.detail-kicker {
+  color: var(--template-type-color);
+  font-size: var(--app-font-size-small);
+  font-weight: 800;
+}
+
+.detail-copy h1 {
+  max-width: 960px;
+  margin: 0;
+  color: var(--app-text);
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.detail-copy p {
+  max-width: 980px;
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.75;
+}
+
+.detail-meta,
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.detail-meta .el-icon {
+  color: var(--template-type-color);
+}
+
+.detail-tags :deep(.el-tag) {
+  height: 32px;
+  padding: 0 12px;
+  border-color: rgba(var(--app-primary-rgb), 0.28);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--app-primary-strong);
+  font-size: var(--app-font-size);
+}
+
+.detail-tags :deep(.el-tag__content) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: 18px;
+}
+
+.detail-main,
+.detail-sidebar {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.detail-sidebar {
+  position: sticky;
+  top: 84px;
+}
+
+.detail-section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+}
+
+.compact-section {
+  gap: 12px;
+}
+
+.section-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-bar h2,
+.detail-section h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.section-bar p {
+  margin: 5px 0 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.workflow-diagram {
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background:
+    linear-gradient(var(--app-border-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-border-soft) 1px, transparent 1px),
+    var(--app-card-bg);
+  background-size: 24px 24px;
+}
+
+.workflow-diagram-canvas {
+  min-width: 100%;
+  min-height: 360px;
+  overflow: auto;
+  padding: 34px;
+}
+
+.workflow-graph-column {
+  display: grid;
+  justify-items: start;
+  width: max-content;
+  min-width: 320px;
+}
+
+.workflow-graph-node {
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  min-width: 220px;
+  max-width: 320px;
+  min-height: 82px;
+  padding: 14px 22px;
+  border: 2px solid var(--app-success);
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.workflow-graph-node:hover,
+.workflow-graph-node:focus-visible {
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
+}
+
+.workflow-graph-node:focus-visible {
+  outline: 3px solid rgba(var(--app-primary-rgb), 0.2);
+  outline-offset: 3px;
+}
+
+.workflow-graph-node.type-pyatb {
+  border-color: var(--app-warning);
+}
+
+.workflow-graph-node.type-lammps {
+  border-color: var(--app-info);
+}
+
+.workflow-graph-node.type-script {
+  border-color: var(--app-info);
+}
+
+.workflow-graph-node strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-graph-node small,
+.workflow-node-dependency,
+.workflow-node-workdir {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-node-dependency,
+.workflow-node-workdir {
+  color: var(--app-text-soft);
+}
+
+.workflow-graph-arrow {
+  display: grid;
+  justify-items: center;
+  width: 220px;
+  height: 42px;
+}
+
+.workflow-graph-arrow span {
+  position: relative;
+  width: 2px;
+  height: 42px;
+  background: rgba(22, 101, 52, 0.56);
+}
+
+.workflow-graph-arrow span::after {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(22, 101, 52, 0.56);
+  border-bottom: 2px solid rgba(22, 101, 52, 0.56);
+  content: '';
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.info-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.info-list div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-elevated);
+}
+
+.info-list dt {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.info-list dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  font-size: var(--app-font-size);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.step-detail-content {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.step-detail-summary {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.step-detail-summary-head,
+.step-config-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.step-detail-summary h3,
+.step-config-head h3 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.step-detail-summary-head p,
+.step-config-head p {
+  margin: 4px 0 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.7;
+}
+
+.step-detail-summary h4 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: var(--app-font-size);
+  font-weight: 900;
+}
+
+.step-detail-summary > p {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size);
+  line-height: 1.8;
+}
+
+.step-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 0;
+}
+
+.step-detail-meta div {
+  min-width: 150px;
+}
+
+.step-detail-meta dt {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.step-detail-meta dd {
+  min-width: 0;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--app-text);
+  font-weight: 800;
+}
+
+.step-config-section {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.step-readonly-code {
+  max-height: 520px;
+  margin: 0;
+  overflow: auto;
+  padding: 16px 18px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--app-card-elevated) 92%, #fff 8%);
+  color: var(--app-text);
+  font-family: var(--app-mono-font);
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.workflow-step-drawer :deep(.el-drawer__header) {
+  align-items: center;
+  margin-bottom: 0;
+  padding: 26px 32px 18px;
+}
+
+.workflow-step-drawer :deep(.el-drawer__title) {
+  color: var(--app-text);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.workflow-step-drawer :deep(.el-drawer__body) {
+  padding: 12px 32px 32px;
+}
+
+.mono-textarea :deep(.el-textarea__inner) {
+  font-family: var(--app-mono-font);
+  font-size: var(--app-font-size-tiny);
+  line-height: 1.7;
+}
+
+:root[data-theme='dark'] .detail-cover,
+:root[data-theme='dark'] .workflow-graph-node {
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+}
+
+@media (max-width: 1180px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .detail-hero-main,
+  .detail-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-copy {
+    padding-right: 0;
+  }
+
+  .detail-copy h1 {
+    font-size: 24px;
+  }
+
+  .section-bar {
+    display: grid;
+  }
+}
+
+@media (max-width: 560px) {
+  .detail-hero,
+  .detail-section {
+    padding: 14px;
+  }
+
+  .workflow-diagram-canvas {
+    padding: 18px;
+  }
+
+  .workflow-graph-node {
+    min-width: 170px;
+  }
+}
+</style>
+

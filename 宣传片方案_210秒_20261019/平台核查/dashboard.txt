@@ -1,0 +1,1813 @@
+<template>
+  <div class="portal-dashboard-page">
+    <section class="portal-shell">
+      <div class="portal-layout" :class="{ 'has-ai-assistant': showAiAssistant }">
+        <main class="portal-main">
+          <section class="portal-hero" :style="{ '--portal-hero-bg': `url(${homeHeaderBg})` }">
+            <div class="portal-hero-copy">
+              <h1 class="portal-brand-wordmark" aria-label="ABACUSLAB">
+                <span class="portal-brand-wordmark-abacus">ABACUS</span><span class="portal-brand-wordmark-lab">LAB</span>
+              </h1>
+              <p class="portal-hero-title">AI 驱动的材料设计与第一性原理计算平台</p>
+              <p class="portal-hero-desc">从结构设计、第一性原理计算到物性分析与材料发现的一体化平台</p>
+
+              <div class="portal-hero-actions">
+                <button
+                  v-for="action in heroActions"
+                  :key="action.path"
+                  type="button"
+                  class="portal-hero-action"
+                  :class="{ primary: action.primary }"
+                  @click="openRoute(action.path)"
+                >
+                  <el-icon><component :is="action.icon" /></el-icon>
+                  <span>{{ action.title }}</span>
+                </button>
+              </div>
+            </div>
+
+            <EngineBrandCarousel
+              :brands="heroBrands"
+              :carousel-threshold="heroBrandCarouselThreshold"
+              :autoplay-interval="heroBrandCarouselInterval"
+              :transition-duration="heroBrandCarouselTransition"
+            />
+          </section>
+
+          <section class="portal-card quick-entry-card">
+            <h2>快速入口</h2>
+            <div class="quick-entry-grid">
+              <button
+                v-for="entry in quickEntries"
+                :key="entry.title"
+                type="button"
+                class="quick-entry-item"
+                :class="{
+                  'is-disabled': entry.disabled,
+                  'is-active': entry.type === 'properties' && propertyMenuOpen,
+                }"
+                :disabled="entry.disabled"
+                @click="openQuickEntry(entry)"
+              >
+                <img :src="entry.image" :alt="entry.title" />
+                <span>
+                  <strong>{{ entry.title }}</strong>
+                  <small>{{ entry.description }}</small>
+                </span>
+                <em v-if="entry.badge" class="quick-entry-badge">{{ entry.badge }}</em>
+                <el-icon
+                  v-if="!entry.disabled"
+                  class="quick-entry-arrow"
+                  :class="{ 'is-open': entry.type === 'properties' && propertyMenuOpen }"
+                >
+                  <ArrowRight />
+                </el-icon>
+              </button>
+
+              <div v-if="propertyMenuOpen" class="property-entry-panel">
+                <button
+                  v-for="item in propertyEntries"
+                  :key="item.path"
+                  type="button"
+                  class="property-entry-option"
+                  @click="openPropertyEntry(item.path)"
+                >
+                  <span>{{ item.label }}</span>
+                  <el-icon><ArrowRight /></el-icon>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="portal-bottom-grid">
+            <article class="portal-card recent-workflow-card">
+              <header class="portal-card-header">
+                <h2>
+                  <span class="section-title-icon">
+                    <el-icon><Clock /></el-icon>
+                  </span>
+                  最近工作流
+                </h2>
+                <button type="button" @click="openRoute('/workflows')">
+                  查看全部
+                  <el-icon><ArrowRight /></el-icon>
+                </button>
+              </header>
+
+              <div class="workflow-table" v-loading="workflowStore.loading">
+                <div class="workflow-table-head">
+                  <span>工作流名称</span>
+                  <span>更新时间</span>
+                  <span>状态</span>
+                </div>
+
+                <button
+                  v-for="workflow in visibleWorkflows"
+                  :key="workflow.id"
+                  type="button"
+                  class="workflow-table-row"
+                  @click="openWorkflow(workflow.id)"
+                >
+                  <span class="workflow-name-cell">
+                    <span class="workflow-state-icon" :class="`status-${normalizeStatus(workflow.status)}`">
+                      <el-icon><component :is="getWorkflowStatusIcon(workflow.status)" /></el-icon>
+                    </span>
+                    <strong>{{ workflow.name || '未命名工作流' }}</strong>
+                  </span>
+                  <span class="workflow-time-cell">{{ getWorkflowUpdatedText(workflow) }}</span>
+                  <span class="workflow-status-pill" :class="`status-${normalizeStatus(workflow.status)}`">
+                    <i></i>
+                    {{ workflowStatusText(workflow.status) }}
+                  </span>
+                </button>
+
+                <div v-if="!visibleWorkflows.length" class="portal-empty-state">
+                  暂无工作流记录
+                </div>
+              </div>
+            </article>
+
+            <article class="portal-card task-overview-card">
+              <header class="portal-card-header">
+                <h2>
+                  <span class="section-title-icon">
+                    <el-icon><Clock /></el-icon>
+                  </span>
+                  任务状态概览
+                </h2>
+              </header>
+
+              <div class="task-overview-body">
+                <div class="task-stat-row">
+                  <span v-for="stat in workflowOverviewStats" :key="stat.key" class="task-stat-item">
+                    <strong :class="`tone-${stat.key}`">{{ stat.value }}</strong>
+                    <small>{{ stat.label }}</small>
+                  </span>
+                </div>
+
+                <div class="task-overview-chart">
+                  <div class="task-ring-wrap">
+                    <div ref="workflowOverviewChartRef" class="task-ring-chart" aria-label="任务状态统计圆环"></div>
+                    <span class="task-ring-center">
+                      <strong>{{ workflowOverviewTotal }}</strong>
+                      <small>总任务</small>
+                    </span>
+                  </div>
+                  <div class="task-ring-legend">
+                    <span v-for="item in workflowRingLegend" :key="item.key">
+                      <i :class="`tone-${item.key}`"></i>
+                      <em>{{ item.label }}</em>
+                      <strong>{{ item.percent }}%（{{ item.value }}）</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="portal-card project-card">
+              <header class="portal-card-header">
+                <h2>
+                  <span class="section-title-icon">
+                    <el-icon><Folder /></el-icon>
+                  </span>
+                  常用项目
+                </h2>
+                <button type="button" @click="openRoute('/projects')">
+                  工作台
+                  <el-icon><ArrowRight /></el-icon>
+                </button>
+              </header>
+
+              <div class="project-card-list" v-loading="projectStore.loading">
+                <button
+                  v-for="project in visibleProjects"
+                  :key="project.id"
+                  type="button"
+                  class="project-rich-row"
+                  @click="openProject(project.id)"
+                >
+                  <span class="project-rich-icon">
+                    <el-icon><Folder /></el-icon>
+                  </span>
+                  <span class="project-rich-copy">
+                    <strong>{{ project.name || '未命名项目' }}</strong>
+                    <small>{{ project.description || project.id || 'project' }}</small>
+                  </span>
+                </button>
+
+                <div v-if="!visibleProjects.length" class="portal-empty-state">
+                  暂无项目
+                </div>
+              </div>
+            </article>
+          </section>
+        </main>
+
+        <AiAssistantPanel v-if="showAiAssistant" :online="systemStore.healthy" />
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import * as echarts from 'echarts/core'
+import { PieChart } from 'echarts/charts'
+import { CanvasRenderer } from 'echarts/renderers'
+import {
+  ArrowRight,
+  CircleCheckFilled,
+  Clock,
+  Folder,
+  Loading,
+  Plus,
+  WarningFilled,
+} from '@element-plus/icons-vue'
+
+import abacusLogo from '@/assets/logos/abacus-logo-c.png'
+import lammpsLogo from '@/assets/logos/lammps-logo.png'
+import homeHeaderBg from '@/assets/logos/home-header-bg-wide.png'
+import databaseIcon from '@/assets/logos/home-database.svg'
+import propertyIcon from '@/assets/logos/home-property.svg'
+import structureIcon from '@/assets/logos/structure-modeling.svg'
+import templateIcon from '@/assets/logos/home-template.svg'
+import toolboxIcon from '@/assets/logos/home-toolbox.svg'
+import pyatbLogo from '@/assets/logos/pyatb-display-transparent.png'
+import tb2jLogo from '@/assets/logos/tb2j-wordmark.svg'
+import { navItems } from '@/config/navigation'
+import { useProjectStore } from '@/stores/projects'
+import { useSystemStore } from '@/stores/system'
+import { useWorkflowStore } from '@/stores/workflows'
+import { formatDate, workflowStatusText } from '@/utils/format'
+import AiAssistantPanel from './components/AiAssistantPanel.vue'
+import EngineBrandCarousel from './components/EngineBrandCarousel.vue'
+
+echarts.use([CanvasRenderer, PieChart])
+
+const router = useRouter()
+const projectStore = useProjectStore()
+const systemStore = useSystemStore()
+const workflowStore = useWorkflowStore()
+const propertyMenuOpen = ref(false)
+const showAiAssistant = false
+const workflowOverviewChartRef = ref(null)
+let workflowOverviewChart = null
+let workflowOverviewResizeObserver = null
+
+const workflowOverviewColors = {
+  total: '#5368ff',
+  running: '#5368ff',
+  completed: '#63c891',
+  failed: '#df4450',
+  stopped: '#9aa3b8',
+}
+
+const visibleWorkflows = computed(() => workflowStore.recentWorkflows.slice(0, 10))
+const visibleProjects = computed(() => projectStore.projects.slice(0, 5))
+const propertyEntries = computed(() => navItems.find((item) => item.path === '/properties')?.children || [])
+const workflowStatusSummary = computed(() => {
+  const summary = systemStore.workflowSummary || {}
+
+  if (Object.keys(summary).length) {
+    return summary
+  }
+
+  return workflowStore.workflows.reduce((result, workflow) => {
+    const status = normalizeStatus(workflow.status)
+    result[status] = (result[status] || 0) + 1
+    return result
+  }, {})
+})
+const workflowOverviewTotal = computed(() => {
+  const summaryTotal = Object.values(workflowStatusSummary.value || {}).reduce((total, value) => total + Number(value || 0), 0)
+  return Math.max(
+    Number(systemStore.workflowTotal || 0),
+    summaryTotal,
+    Number(workflowStore.pagination.total || 0),
+    workflowStore.workflows.length || 0,
+  )
+})
+const workflowOverviewStats = computed(() => {
+  const completed = getSummaryCount(['completed', 'success'])
+  const failed = getSummaryCount(['failed'])
+  const stopped = getSummaryCount(['stopped', 'cancelled', 'paused'])
+  const running = getSummaryCount(['running'])
+
+  return [
+    { key: 'total', label: '总任务', value: workflowOverviewTotal.value },
+    { key: 'running', label: '运行中', value: running },
+    { key: 'completed', label: '已完成', value: completed },
+    { key: 'failed', label: '失败', value: failed },
+    { key: 'stopped', label: '已停止', value: stopped },
+  ]
+})
+const workflowRingLegend = computed(() => (
+  workflowOverviewStats.value
+    .filter((item) => item.key !== 'total')
+    .map((item) => ({
+      ...item,
+      percent: getPercent(item.value, workflowOverviewTotal.value),
+    }))
+))
+const workflowRingChartData = computed(() => {
+  if (!workflowOverviewTotal.value) {
+    return [
+      {
+        name: '暂无任务',
+        value: 1,
+        itemStyle: {
+          color: '#9aa3b8',
+        },
+      },
+    ]
+  }
+
+  const knownTotal = workflowRingLegend.value.reduce((total, item) => total + Number(item.value || 0), 0)
+  const remainder = Math.max(Number(workflowOverviewTotal.value || 0) - knownTotal, 0)
+  const segments = workflowRingLegend.value
+    .filter((item) => Number(item.value || 0) > 0)
+    .map((item) => ({
+      name: item.label,
+      value: item.value,
+      itemStyle: {
+        color: workflowOverviewColors[item.key],
+      },
+    }))
+
+  if (remainder) {
+    segments.push({
+      name: '未统计',
+      value: remainder,
+      itemStyle: {
+        color: '#e9edf5',
+      },
+    })
+  }
+
+  return segments
+})
+
+const workflowRingOption = computed(() => ({
+  animation: false,
+  series: [
+    {
+      type: 'pie',
+      radius: ['58%', '88%'],
+      center: ['50%', '50%'],
+      data: workflowRingChartData.value,
+      silent: true,
+      label: {
+        show: false,
+      },
+      labelLine: {
+        show: false,
+      },
+      emphasis: {
+        disabled: true,
+      },
+    },
+  ],
+}))
+
+async function renderWorkflowOverviewChart() {
+  await nextTick()
+
+  if (!workflowOverviewChartRef.value) {
+    return
+  }
+
+  if (!workflowOverviewChart) {
+    workflowOverviewChart = echarts.init(workflowOverviewChartRef.value, null, {
+      renderer: 'canvas',
+    })
+    window.addEventListener('resize', resizeWorkflowOverviewChart)
+
+    if (typeof ResizeObserver !== 'undefined') {
+      workflowOverviewResizeObserver = new ResizeObserver(resizeWorkflowOverviewChart)
+      workflowOverviewResizeObserver.observe(workflowOverviewChartRef.value)
+    }
+  }
+
+  workflowOverviewChart.setOption(workflowRingOption.value, {
+    notMerge: true,
+    lazyUpdate: true,
+  })
+  resizeWorkflowOverviewChart()
+}
+
+function resizeWorkflowOverviewChart() {
+  if (!workflowOverviewChart || !workflowOverviewChartRef.value) {
+    return
+  }
+
+  workflowOverviewChart.resize()
+}
+
+function disposeWorkflowOverviewChart() {
+  workflowOverviewResizeObserver?.disconnect()
+  workflowOverviewResizeObserver = null
+  window.removeEventListener('resize', resizeWorkflowOverviewChart)
+  workflowOverviewChart?.dispose()
+  workflowOverviewChart = null
+}
+
+watch(workflowRingOption, renderWorkflowOverviewChart, {
+  deep: true,
+  flush: 'post',
+})
+
+onBeforeUnmount(() => {
+  disposeWorkflowOverviewChart()
+})
+
+const heroActions = [
+  { title: '新建项目', path: '/projects?create=1', icon: Plus, primary: true },
+]
+
+const heroBrands = [
+  {
+    key: 'abacus',
+    name: 'ABACUS',
+    logo: abacusLogo,
+    href: 'https://abacus.ustc.edu.cn/main.htm',
+  },
+  {
+    key: 'pyatb',
+    name: 'PYATB',
+    logo: pyatbLogo,
+    href: 'https://pyatb.github.io/pyatb/',
+  },
+  {
+    key: 'tb2j',
+    name: 'TB2J',
+    logo: tb2jLogo,
+    href: 'https://github.com/mailhexu/TB2J',
+  },
+  // {
+  //   key: 'lammps',
+  //   name: 'LAMMPS',
+  //   logo: lammpsLogo,
+  //   href: 'https://www.lammps.org/',
+  // },
+]
+
+const heroBrandCarouselThreshold = 3
+const heroBrandCarouselInterval = 3000
+const heroBrandCarouselTransition = 500
+
+const quickEntries = [
+  {
+    title: '模板库',
+    description: '常用计算模板与流程',
+    path: '/templates',
+    image: templateIcon,
+  },
+  {
+    title: '结构建模',
+    description: '构建与优化晶体结构',
+    path: '/properties/modeling',
+    image: structureIcon,
+  },
+  {
+    title: '物性绘制',
+    description: '可视化与绘图工具',
+    path: '',
+    image: propertyIcon,
+    type: 'properties',
+  },
+  {
+    title: '工具箱',
+    description: '实用工具',
+    path: '/tools',
+    image: toolboxIcon,
+  },
+  {
+    title: '材料数据库',
+    description: '材料数据与性质查询',
+    path: '',
+    image: databaseIcon,
+    disabled: true,
+    badge: '暂未开放',
+  },
+]
+
+const workflowStatusIcons = {
+  completed: CircleCheckFilled,
+  failed: WarningFilled,
+  pending: Clock,
+  running: Loading,
+  success: CircleCheckFilled,
+}
+
+async function refreshAll() {
+  await Promise.all([systemStore.refresh(), loadDashboardWorkflows(), projectStore.loadProjects()])
+}
+
+function openRoute(path) {
+  router.push(path)
+}
+
+function openQuickEntry(entry) {
+  if (!entry?.path || entry.disabled) {
+    if (entry?.type === 'properties') {
+      propertyMenuOpen.value = !propertyMenuOpen.value
+    }
+
+    return
+  }
+
+  propertyMenuOpen.value = false
+  openRoute(entry.path)
+}
+
+function openPropertyEntry(path) {
+  propertyMenuOpen.value = false
+  openRoute(path)
+}
+
+function openWorkflow(workflowId) {
+  if (!workflowId) return
+  router.push(`/workflows/${encodeURIComponent(workflowId)}`)
+}
+
+function openProject(projectId) {
+  if (!projectId) return
+  router.push({ name: 'project-detail', params: { projectId } })
+}
+
+function normalizeStatus(status) {
+  return String(status || 'unknown').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-')
+}
+
+function getSummaryCount(keys) {
+  return keys.reduce((total, key) => total + Number(workflowStatusSummary.value?.[key] || 0), 0)
+}
+
+function getPercent(value, total) {
+  if (!total) return 0
+  return Math.round((Number(value || 0) / total) * 1000) / 10
+}
+
+function getWorkflowStatusIcon(status) {
+  return workflowStatusIcons[normalizeStatus(status)] || Clock
+}
+
+function getWorkflowUpdatedText(workflow) {
+  return formatDate(workflow?.updated_at || workflow?.created_at || '')
+}
+
+function getProjectUpdatedText(project) {
+  const value = project?.updated_at || project?.created_at
+
+  if (!value) {
+    return '最近更新'
+  }
+
+  return formatDate(value)
+}
+
+function loadDashboardWorkflows() {
+  workflowStore.resetFilters()
+  return workflowStore.loadWorkflows({ limit: 10, offset: 0 })
+}
+
+onMounted(async () => {
+  await refreshAll()
+  await renderWorkflowOverviewChart()
+})
+</script>
+
+<style>
+.portal-dashboard-page {
+  --dashboard-min-height: calc(var(--design-height, 100vh) - 88px);
+  height: auto;
+  min-height: var(--dashboard-min-height);
+  overflow-x: hidden;
+  overflow-y: visible;
+  padding: 0;
+  color: var(--app-text);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size);
+}
+
+.portal-dashboard-page button {
+  font: inherit;
+}
+
+.portal-shell {
+  display: grid;
+  min-height: var(--dashboard-min-height);
+  height: auto;
+  overflow: visible;
+}
+
+.portal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  height: auto;
+  min-height: var(--dashboard-min-height);
+  padding: 0;
+  align-items: stretch;
+  background: transparent;
+}
+
+.portal-layout.has-ai-assistant {
+  grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.portal-main {
+  display: grid;
+  grid-template-rows: auto auto minmax(auto, 1fr);
+  align-content: stretch;
+  gap: 14px;
+  height: auto;
+  min-width: 0;
+  min-height: var(--dashboard-min-height);
+}
+
+.portal-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(420px, 0.92fr) minmax(520px, 1.08fr) minmax(280px, 0.62fr);
+  gap: 24px;
+  align-items: center;
+  min-height: clamp(250px, 15vw, 292px);
+  overflow: hidden;
+  border: 1px solid #e0e8f6;
+  border-radius: 12px;
+  background-color: #f8fbff;
+  background-image: var(--portal-hero-bg);
+  background-position: right center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.portal-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 13px;
+  min-width: 0;
+  padding: 32px 0 32px 40px;
+}
+
+.portal-hero-copy h1 {
+  margin: 0;
+  font-family: var(--app-font-family);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.portal-brand-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  width: max-content;
+  max-width: 100%;
+  font-size: 32px;
+  font-weight: 850;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.portal-brand-wordmark-abacus {
+  color: #5067ed;
+}
+
+.portal-brand-wordmark-lab {
+  color: #273574;
+}
+
+.portal-hero .engine-brand-carousel {
+  position: relative;
+  z-index: 1;
+}
+
+.portal-hero-title {
+  margin: 0;
+  color: #1d2948;
+  font-size: var(--app-font-size-section);
+  font-weight: 850;
+  line-height: 1.38;
+}
+
+.portal-hero-desc {
+  margin: 0;
+  color: #5b6680;
+  font-size: var(--app-font-size);
+  line-height: 1.6;
+}
+
+.portal-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.portal-hero-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 164px;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 1px solid #b9c8ff;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #3454ff;
+  cursor: pointer;
+  font-size: var(--app-font-size);
+  font-weight: 850;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.portal-hero-action.primary,
+.portal-hero-action:hover {
+  border-color: #3454ff;
+  background: linear-gradient(135deg, #315dff, #693bff);
+  color: #fff;
+  box-shadow: 0 16px 32px rgba(52, 84, 255, 0.24);
+}
+
+.portal-hero-action:hover {
+  transform: translateY(-1px);
+}
+
+.portal-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e0e8f6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(23, 32, 51, 0.04);
+}
+
+.quick-entry-card {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-self: start;
+  align-content: start;
+  gap: 10px;
+  height: max-content;
+  overflow: visible;
+  padding: 12px 18px 14px;
+  position: relative;
+  z-index: 4;
+}
+
+.task-overview-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  container-type: inline-size;
+  min-width: 0;
+  min-height: 0;
+}
+
+.task-overview-body {
+  --task-chart-size: 160px;
+  display: grid;
+  grid-template-areas: "chart stats legend";
+  grid-template-columns: var(--task-chart-size) minmax(270px, 1fr) minmax(190px, auto);
+  gap: 24px;
+  align-items: center;
+  min-height: 0;
+  padding: 14px 20px 18px;
+}
+
+.task-stat-row {
+  display: grid;
+  grid-area: stats;
+  grid-template-columns: repeat(3, minmax(76px, 1fr));
+  gap: 10px;
+  justify-items: stretch;
+}
+
+.task-stat-item {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  justify-items: center;
+  width: 100%;
+  min-height: 64px;
+  min-width: 0;
+  padding: 10px 8px;
+  border: 1px solid #e5ebf5;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 24px rgba(31, 45, 78, 0.06);
+  text-align: center;
+}
+
+.task-stat-item strong {
+  color: #5368ff;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.task-stat-item small {
+  color: var(--app-text);
+  font-size: var(--app-font-size-small);
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.task-stat-item .tone-completed {
+  color: #3fb678;
+}
+
+.task-stat-item .tone-failed {
+  color: #df4450;
+}
+
+.task-stat-item .tone-stopped {
+  color: #6f7890;
+}
+
+.task-overview-chart {
+  display: contents;
+}
+
+.task-ring-wrap {
+  position: relative;
+  display: grid;
+  grid-area: chart;
+  place-items: center;
+  width: var(--task-chart-size);
+  height: var(--task-chart-size);
+}
+
+.task-ring-chart {
+  width: var(--task-chart-size);
+  height: var(--task-chart-size);
+}
+
+.task-ring-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  pointer-events: none;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  color: var(--app-text);
+}
+
+.task-ring-center strong {
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.task-ring-center small {
+  color: var(--app-text);
+  font-size: var(--app-font-size-small);
+  font-weight: 750;
+}
+
+.task-ring-legend {
+  display: grid;
+  grid-area: legend;
+  align-content: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 138px;
+  padding-left: 24px;
+  border-left: 1px solid #e5ebf5;
+}
+
+.task-ring-legend span {
+  display: grid;
+  grid-template-columns: 10px 58px max-content;
+  gap: 12px;
+  align-items: center;
+  color: var(--app-text);
+  font-size: var(--app-font-size-small);
+  white-space: nowrap;
+}
+
+.task-ring-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #5368ff;
+}
+
+.task-ring-legend i.tone-completed {
+  background: #63c891;
+}
+
+.task-ring-legend i.tone-failed {
+  background: #df4450;
+}
+
+.task-ring-legend i.tone-stopped {
+  background: #9aa3b8;
+}
+
+.task-ring-legend em {
+  font-style: normal;
+}
+
+.task-ring-legend strong {
+  color: var(--app-text);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+@container (max-width: 760px) {
+  .task-overview-body {
+    --task-chart-size: 138px;
+    grid-template-columns: var(--task-chart-size) minmax(210px, 1fr) minmax(154px, auto);
+    gap: 16px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .task-stat-row {
+    grid-template-columns: repeat(3, minmax(58px, 1fr));
+    gap: 8px;
+  }
+
+  .task-stat-item {
+    min-height: 66px;
+    padding: 9px 6px;
+  }
+
+  .task-stat-item strong {
+    font-size: 22px;
+  }
+
+  .task-ring-center strong {
+    font-size: 30px;
+  }
+
+  .task-ring-legend {
+    min-height: 120px;
+    padding-left: 16px;
+  }
+
+  .task-ring-legend span {
+    grid-template-columns: 9px 50px max-content;
+    gap: 9px;
+  }
+}
+
+@container (max-width: 600px) {
+  .task-overview-body {
+    grid-template-areas:
+      "chart stats"
+      "legend legend";
+    grid-template-columns: var(--task-chart-size) minmax(0, 1fr);
+  }
+
+  .task-stat-row {
+    grid-template-columns: repeat(3, minmax(50px, 1fr));
+    gap: 6px;
+  }
+
+  .task-stat-item {
+    min-height: 60px;
+    padding: 8px 4px;
+    border-radius: 10px;
+  }
+
+  .task-stat-item strong {
+    font-size: 20px;
+  }
+
+  .task-stat-item small {
+    font-size: 12px;
+  }
+
+  .task-ring-center strong {
+    font-size: 24px;
+  }
+
+  .task-ring-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 0;
+    padding-top: 14px;
+    padding-left: 0;
+    border-top: 1px solid #e5ebf5;
+    border-left: 0;
+  }
+}
+
+@container (max-width: 420px) {
+  .task-overview-body {
+    grid-template-areas:
+      "chart"
+      "stats"
+      "legend";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .task-ring-wrap {
+    justify-self: center;
+  }
+}
+
+.quick-entry-card h2,
+.portal-card-header h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: var(--app-font-size-card-title);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.quick-entry-grid {
+  display: grid;
+  position: relative;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.quick-entry-item {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 60px;
+  padding: 7px 12px;
+  border: 1px solid #e3ebf8;
+  border-radius: 9px;
+  background: #fff;
+  color: #172033;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.quick-entry-item:hover {
+  border-color: #b8c8ff;
+  box-shadow: 0 14px 26px rgba(52, 84, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.quick-entry-item.is-active {
+  border-color: #8fb0ff;
+  background: #f7faff;
+  box-shadow: 0 12px 24px rgba(52, 84, 255, 0.1);
+}
+
+.quick-entry-item.is-disabled,
+.quick-entry-item:disabled {
+  border-color: #e7edf5;
+  background: #f8fafc;
+  color: #8b96aa;
+  cursor: not-allowed;
+}
+
+.quick-entry-item.is-disabled:hover,
+.quick-entry-item:disabled:hover {
+  border-color: #e7edf5;
+  box-shadow: none;
+  transform: none;
+}
+
+.quick-entry-item.is-disabled img,
+.quick-entry-item:disabled img {
+  opacity: 0.46;
+  filter: grayscale(1);
+}
+
+.quick-entry-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.quick-entry-item span {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.quick-entry-item strong {
+  overflow: hidden;
+  color: #172033;
+  font-size: var(--app-font-size);
+  font-weight: 900;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-entry-item small {
+  overflow: hidden;
+  color: #6b7691;
+  font-size: var(--app-font-size-small);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-entry-item.is-disabled strong,
+.quick-entry-item:disabled strong {
+  color: #8b96aa;
+}
+
+.quick-entry-item.is-disabled small,
+.quick-entry-item:disabled small {
+  color: #a8b0bf;
+}
+
+.quick-entry-item > .el-icon {
+  color: #42537d;
+  font-size: 17px;
+}
+
+.quick-entry-arrow {
+  transition: transform 0.18s ease;
+}
+
+.quick-entry-arrow.is-open {
+  transform: rotate(90deg);
+}
+
+.quick-entry-item.is-disabled > .el-icon,
+.quick-entry-item:disabled > .el-icon {
+  color: #b8c0cf;
+}
+
+.quick-entry-badge {
+  justify-self: end;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #8b96aa;
+  font-size: var(--app-font-size-small);
+  font-style: normal;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.property-entry-panel {
+  display: grid;
+  position: absolute;
+  z-index: 20;
+  top: 68px;
+  right: 0;
+  gap: 8px;
+  width: calc((100% - 24px) / 3);
+  max-height: 244px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #dce6f5;
+  border-radius: 9px;
+  background: #f8fbff;
+  box-shadow: 0 18px 38px rgba(31, 45, 78, 0.14);
+}
+
+.property-entry-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 12px 0 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #2f3b58;
+  cursor: pointer;
+  font-size: var(--app-font-size-small);
+  font-weight: 750;
+  text-align: left;
+}
+
+.property-entry-option:hover {
+  background: #eef4ff;
+  color: #315dff;
+}
+
+.property-entry-option span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-entry-option .el-icon {
+  flex: 0 0 auto;
+  color: #6b7da8;
+  font-size: 15px;
+}
+
+.portal-bottom-grid {
+  display: grid;
+  grid-template-areas:
+    "workflows overview"
+    "workflows projects";
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-rows: auto auto;
+  gap: 14px;
+  align-items: stretch;
+  min-height: max-content;
+}
+
+.recent-workflow-card,
+.task-overview-card,
+.project-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.portal-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 0 20px;
+  border-bottom: 1px solid #edf2fa;
+}
+
+.portal-card-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  color: #5368ff;
+  font-size: 22px;
+}
+
+.portal-card-header button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: #3454ff;
+  cursor: pointer;
+  font-size: var(--app-font-size);
+  font-weight: 850;
+}
+
+.portal-card-header button .el-icon {
+  font-size: 16px;
+}
+
+.workflow-table {
+  display: grid;
+  align-content: start;
+  padding: 0 20px 14px;
+}
+
+.workflow-table-head,
+.workflow-table-row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: minmax(0, 1.25fr) minmax(170px, 0.65fr) minmax(112px, 0.36fr);
+  column-gap: 20px;
+  padding-right: 14px;
+  padding-left: 14px;
+}
+
+.recent-workflow-card {
+  grid-area: workflows;
+}
+
+.task-overview-card {
+  grid-area: overview;
+}
+
+.project-card {
+  grid-area: projects;
+}
+
+.workflow-table-head {
+  min-height: 42px;
+  border-bottom: 1px solid #edf2fa;
+  color: #7b879d;
+  font-size: var(--app-font-size-small);
+  font-weight: 850;
+}
+
+.workflow-table-head span:last-child {
+  min-width: 78px;
+  justify-self: end;
+  text-align: center;
+}
+
+.workflow-table-row {
+  width: 100%;
+  min-height: 58px;
+  border: 0;
+  border-bottom: 1px solid #edf2fa;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workflow-table-row:hover {
+  background: #f7faff;
+}
+
+.workflow-name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.workflow-state-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #5368ff;
+  font-size: 20px;
+}
+
+.workflow-state-icon.status-completed,
+.workflow-state-icon.status-success {
+  background: #eefaf2;
+  color: #22a45d;
+}
+
+.workflow-state-icon.status-failed {
+  background: #fff0f0;
+  color: #ef4444;
+}
+
+.workflow-state-icon.status-paused,
+.workflow-state-icon.status-pending,
+.workflow-state-icon.status-cancelled,
+.workflow-state-icon.status-canceled,
+.workflow-state-icon.status-stopped,
+.workflow-state-icon.status-skipped,
+.workflow-state-icon.status-unknown {
+  background: #f1f3f8;
+  color: #8b94a8;
+}
+
+.workflow-state-icon.status-running .el-icon {
+  animation: workflow-spin 1.2s linear infinite;
+}
+
+.workflow-name-cell strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #1b2643;
+  font-size: var(--app-font-size);
+  font-weight: 850;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-time-cell {
+  overflow: hidden;
+  color: #68758f;
+  font-size: var(--app-font-size-small);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  justify-self: end;
+  min-width: 78px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e4e8f0;
+  border-radius: 999px;
+  background: #f1f3f8;
+  color: #68758f;
+  font-size: var(--app-font-size-small);
+  font-weight: 850;
+  text-align: center;
+}
+
+.workflow-status-pill i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.workflow-status-pill.status-running {
+  border-color: #dce4ff;
+  background: #eef2ff;
+  color: #3454ff;
+}
+
+.workflow-status-pill.status-completed,
+.workflow-status-pill.status-success {
+  border-color: #dce8df;
+  background: #eef7f0;
+  color: #22a45d;
+}
+
+.workflow-status-pill.status-failed {
+  border-color: #ffdada;
+  background: #fff0f0;
+  color: #ef4444;
+}
+
+.workflow-status-pill.status-paused,
+.workflow-status-pill.status-pending,
+.workflow-status-pill.status-cancelled,
+.workflow-status-pill.status-canceled,
+.workflow-status-pill.status-stopped,
+.workflow-status-pill.status-skipped,
+.workflow-status-pill.status-unknown {
+  border-color: #e4e8f0;
+  background: #f1f3f8;
+  color: #68758f;
+}
+
+.project-card-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  align-content: start;
+  padding: 10px 20px 14px;
+}
+
+.project-rich-row {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid #dfe8f6;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.project-rich-row:nth-of-type(odd):last-of-type {
+  grid-column: 1 / -1;
+}
+
+.project-rich-row:hover {
+  border-color: #b8c8ff;
+  background: #f8fbff;
+}
+
+.project-rich-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: #5368ff;
+  font-size: 34px;
+}
+
+.project-rich-copy {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.project-rich-copy strong,
+.project-rich-copy small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-rich-copy strong {
+  color: #1b2643;
+  font-size: var(--app-font-size);
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.project-rich-copy small {
+  color: #52607b;
+  font-size: var(--app-font-size-small);
+  line-height: 1.45;
+}
+
+.portal-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  color: #7d879b;
+  font-size: var(--app-font-size-small);
+}
+
+@keyframes workflow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:root[data-theme='dark'] .portal-shell,
+:root[data-theme='dark'] .portal-card,
+:root[data-theme='dark'] .task-stat-item,
+:root[data-theme='dark'] .quick-entry-item,
+:root[data-theme='dark'] .property-entry-panel,
+:root[data-theme='dark'] .project-rich-row {
+  border-color: var(--app-border);
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  box-shadow: none;
+}
+
+:root[data-theme='dark'] .portal-layout {
+  background: var(--app-bg);
+}
+
+:root[data-theme='dark'] .portal-hero {
+  border-color: var(--app-border);
+  background-color: var(--app-card-bg);
+  background-image: var(--portal-hero-bg);
+}
+
+:root[data-theme='dark'] .portal-brand-wordmark-abacus {
+  color: #8da3ff;
+}
+
+:root[data-theme='dark'] .portal-brand-wordmark-lab {
+  color: #d6e2ff;
+}
+
+:root[data-theme='dark'] .quick-entry-card h2,
+:root[data-theme='dark'] .portal-card-header h2,
+:root[data-theme='dark'] .quick-entry-item strong,
+:root[data-theme='dark'] .workflow-name-cell strong,
+:root[data-theme='dark'] .project-rich-copy strong {
+  color: var(--app-text);
+}
+
+:root[data-theme='dark'] .quick-entry-item small,
+:root[data-theme='dark'] .workflow-table-head,
+:root[data-theme='dark'] .workflow-time-cell,
+:root[data-theme='dark'] .project-rich-copy small {
+  color: var(--app-text-muted);
+}
+
+:root[data-theme='dark'] .workflow-table-row:hover,
+:root[data-theme='dark'] .project-rich-row:hover,
+:root[data-theme='dark'] .quick-entry-item.is-active,
+:root[data-theme='dark'] .property-entry-option:hover {
+  background: var(--app-card-elevated);
+}
+
+:root[data-theme='dark'] .portal-card-header,
+:root[data-theme='dark'] .workflow-table-head,
+:root[data-theme='dark'] .workflow-table-row,
+:root[data-theme='dark'] .task-stat-item,
+:root[data-theme='dark'] .project-rich-row {
+  border-color: var(--app-border);
+}
+
+:root[data-theme='dark'] .task-ring-center {
+  color: var(--app-text);
+}
+
+:root[data-theme='dark'] .task-stat-item small,
+:root[data-theme='dark'] .task-ring-center small,
+:root[data-theme='dark'] .task-ring-legend,
+:root[data-theme='dark'] .task-ring-legend strong {
+  color: var(--app-text);
+}
+
+:root[data-theme='dark'] .task-ring-legend {
+  border-color: var(--app-border);
+}
+
+@media (max-width: 1600px) {
+  .portal-layout.has-ai-assistant {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+
+  .portal-hero {
+    grid-template-columns: minmax(360px, 0.9fr) minmax(420px, 1.1fr);
+    gap: 20px;
+    padding-right: 24px;
+    background-position: 84% center;
+  }
+
+}
+
+@media (max-width: 1280px) {
+  .portal-dashboard-page {
+    height: auto;
+    min-height: var(--dashboard-min-height);
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .portal-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: var(--dashboard-min-height);
+  }
+
+  .portal-main {
+    height: auto;
+    min-height: var(--dashboard-min-height);
+  }
+
+  .portal-bottom-grid {
+    grid-template-areas:
+      "workflows"
+      "overview"
+      "projects";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .portal-hero {
+    grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+    gap: 18px;
+    padding-right: 24px;
+    background-position: 84% center;
+  }
+
+  .portal-hero-copy {
+    padding-left: 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .portal-layout {
+    padding: 0;
+  }
+
+  .portal-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    min-height: 0;
+    padding: 28px;
+    background-position: 82% center;
+    background-size: auto 100%;
+  }
+
+  .portal-hero-copy {
+    padding: 0;
+  }
+
+  .portal-hero-copy h1 {
+    font-size: 32px;
+  }
+
+  .quick-entry-grid,
+  .portal-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .property-entry-panel {
+    top: 204px;
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  .workflow-table-head,
+  .workflow-table-row {
+    grid-template-columns: minmax(0, 1fr) 124px auto;
+  }
+
+  .project-rich-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+
+  .task-overview-chart {
+    grid-template-columns: var(--task-chart-size) max-content;
+  }
+}
+
+@media (max-width: 640px) {
+  .portal-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    min-height: 0;
+    padding: 28px 20px;
+    background-position: 82% center;
+    background-size: auto 100%;
+  }
+
+  .portal-hero-copy {
+    padding: 0;
+  }
+
+  .portal-hero-copy h1 {
+    font-size: 30px;
+  }
+
+  .portal-hero-title {
+    font-size: 18px;
+  }
+
+  .portal-hero-action {
+    flex: 1 1 100%;
+  }
+
+  .quick-entry-card {
+    padding: 12px;
+  }
+
+  .task-overview-card {
+    padding: 0;
+  }
+
+  .task-stat-row {
+    grid-template-columns: repeat(3, minmax(50px, 1fr));
+    gap: 6px;
+  }
+
+  .task-overview-chart {
+    grid-template-columns: var(--task-chart-size) max-content;
+    width: 100%;
+    gap: 14px;
+  }
+
+  .task-ring-wrap,
+  .task-ring-chart {
+    width: var(--task-chart-size);
+    height: var(--task-chart-size);
+  }
+
+  .quick-entry-item {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    padding: 8px 10px;
+  }
+
+  .quick-entry-item img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .portal-card-header {
+    padding: 0 16px;
+  }
+
+  .workflow-table {
+    padding: 0 16px 12px;
+  }
+
+  .workflow-table-head {
+    display: none;
+  }
+
+  .workflow-table-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .workflow-time-cell,
+  .workflow-status-pill {
+    justify-self: start;
+  }
+
+  .project-card-list {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px 16px 12px;
+  }
+
+  .project-rich-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .project-rich-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 36px;
+  }
+
+}
+</style>
+

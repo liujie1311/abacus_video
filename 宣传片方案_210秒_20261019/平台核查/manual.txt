@@ -1,0 +1,827 @@
+<template>
+  <div class="doc-website">
+    <header class="doc-navbar">
+      <div class="navbar-brand">
+        <Document class="navbar-brand-icon" />
+        <span>ABACUSLAB 用户手册</span>
+      </div>
+
+      <div class="navbar-search">
+        <el-input
+          v-model="searchKeyword"
+          :prefix-icon="Search"
+          clearable
+          placeholder="搜索文档..."
+          @blur="hideSearchResultsSoon"
+          @focus="showSearchResults = searchResults.length > 0 || Boolean(searchKeyword)"
+        />
+        <div v-if="showSearchResults && searchResults.length > 0" class="search-dropdown">
+          <button
+            v-for="result in searchResults"
+            :key="result.id"
+            type="button"
+            class="search-item"
+            @mousedown="selectSearchResult(result)"
+          >
+            <Document class="search-icon" />
+            <span>{{ result.text }}</span>
+          </button>
+        </div>
+        <div v-else-if="showSearchResults && searchKeyword" class="search-dropdown">
+          <div class="search-empty">未找到相关内容</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="doc-main">
+      <aside class="doc-sidebar">
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-title">文档列表</div>
+            <ul class="nav-list">
+              <li
+                v-for="item in sidebarMenu"
+                :key="item.id"
+                :class="['nav-item', { active: currentDocId === item.id }]"
+                @click="loadDoc(item.id)"
+              >
+                <Document class="nav-icon" />
+                <span>{{ item.title }}</span>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <div v-if="tocList.length > 0" class="toc-section">
+          <div class="toc-header">目录</div>
+          <ul class="toc-list">
+            <li
+              v-for="heading in tocList"
+              :key="heading.id"
+              :class="['toc-item', `level-${heading.level}`, { active: activeHeading === heading.id }]"
+              @click="scrollToHeading(heading.id)"
+            >
+              {{ heading.text }}
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <main ref="contentRef" v-loading="loading" class="doc-content" @scroll="handleContentScroll">
+        <article v-if="docContent" class="markdown-body" v-html="renderedContent"></article>
+        <el-empty v-else-if="!loading" description="请选择左侧文档查看" />
+      </main>
+    </div>
+
+    <el-image-viewer
+      v-if="showImageViewer"
+      hide-on-click-modal
+      teleported
+      :initial-index="previewIndex"
+      :max-scale="4"
+      :min-scale="0.35"
+      :scale="previewInitialScale"
+      :url-list="previewImages"
+      @close="showImageViewer = false"
+    />
+  </div>
+</template>
+
+<script setup>
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { Document, Search } from '@element-plus/icons-vue'
+import { ElImageViewer } from 'element-plus'
+import { marked } from 'marked'
+import 'element-plus/theme-chalk/el-image-viewer.css'
+
+import userManualMd from './使用手册/用户手册.md?raw'
+
+const localImageModules = import.meta.glob('./使用手册/images/*', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+})
+
+const loading = ref(false)
+const docContent = ref('')
+const searchKeyword = ref('')
+const currentDocId = ref('user-manual')
+const activeHeading = ref('')
+const tocList = ref([])
+const contentRef = ref(null)
+const searchResults = ref([])
+const showSearchResults = ref(false)
+const showImageViewer = ref(false)
+const previewImages = ref([])
+const previewIndex = ref(0)
+const previewInitialScale = 0.72
+
+const sidebarMenu = [
+  { id: 'user-manual', title: '用户手册', content: userManualMd },
+]
+
+const imageUrlMap = Object.entries(localImageModules).reduce((map, [path, url]) => {
+  const fileName = path.split('/').pop()
+  map[fileName] = url
+  map[`images/${fileName}`] = url
+  return map
+}, {})
+
+const displayContent = computed(() => stripManualToc(docContent.value))
+const renderedContent = computed(() => renderMarkdown(displayContent.value))
+let headingRenderIds = new Set()
+
+const markdownRenderer = new marked.Renderer()
+
+markdownRenderer.heading = function ({ tokens, depth }) {
+  const html = this.parser.parseInline(tokens)
+  const text = stripHtml(html)
+  const id = ensureUniqueId(slugify(text), headingRenderIds)
+
+  return `<h${depth} id="${escapeAttr(id)}">${html}</h${depth}>`
+}
+
+markdownRenderer.image = function ({ href, title, text }) {
+  const src = resolveImageUrl(href)
+  const titleAttr = title ? ` title="${escapeAttr(title)}"` : ''
+
+  return `<img src="${escapeAttr(src)}" alt="${escapeAttr(text)}"${titleAttr} loading="lazy">`
+}
+
+markdownRenderer.link = function ({ href, title, tokens }) {
+  const html = this.parser.parseInline(tokens)
+  const titleAttr = title ? ` title="${escapeAttr(title)}"` : ''
+  const targetAttr = String(href || '').startsWith('#') ? '' : ' target="_blank" rel="noopener noreferrer"'
+
+  return `<a href="${escapeAttr(href)}"${titleAttr}${targetAttr}>${html}</a>`
+}
+
+function stripManualToc(markdown) {
+  const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n')
+  const tocStartIndex = lines.findIndex((line) => /^##\s+目录\s*$/.test(line.trim()))
+
+  if (tocStartIndex === -1) {
+    return lines.join('\n')
+  }
+
+  let removeStartIndex = tocStartIndex
+  while (removeStartIndex > 0 && !lines[removeStartIndex - 1].trim()) {
+    removeStartIndex -= 1
+  }
+  if (removeStartIndex > 0 && /^-{3,}$/.test(lines[removeStartIndex - 1].trim())) {
+    removeStartIndex -= 1
+  }
+
+  let removeEndIndex = tocStartIndex + 1
+  while (removeEndIndex < lines.length && !/^-{3,}$/.test(lines[removeEndIndex].trim())) {
+    removeEndIndex += 1
+  }
+  if (removeEndIndex < lines.length && /^-{3,}$/.test(lines[removeEndIndex].trim())) {
+    removeEndIndex += 1
+  }
+  while (removeEndIndex < lines.length && !lines[removeEndIndex].trim()) {
+    removeEndIndex += 1
+  }
+
+  return [
+    ...lines.slice(0, removeStartIndex),
+    '',
+    ...lines.slice(removeEndIndex),
+  ].join('\n')
+}
+
+function slugify(text) {
+  return String(text || '')
+    .trim()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[\\/#?%*:|"<>.]/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+}
+
+function ensureUniqueId(baseId, usedIds) {
+  const fallback = 'section'
+  const normalized = baseId || fallback
+  let id = normalized
+  let index = 2
+
+  while (usedIds.has(id)) {
+    id = `${normalized}-${index}`
+    index += 1
+  }
+
+  usedIds.add(id)
+  return id
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;')
+}
+
+function resolveImageUrl(path) {
+  const rawPath = String(path || '').trim()
+  const normalizedPath = rawPath.replace(/\\/g, '/').replace(/^\.\//, '')
+  const fileName = normalizedPath.split('/').pop()
+
+  return imageUrlMap[normalizedPath] || imageUrlMap[fileName] || rawPath
+}
+
+function stripHtml(value) {
+  return String(value || '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+}
+
+function renderMarkdown(markdown) {
+  headingRenderIds = new Set()
+
+  const html = marked.parse(String(markdown || ''), {
+    async: false,
+    breaks: false,
+    gfm: true,
+    renderer: markdownRenderer,
+  })
+
+  return typeof html === 'string' ? html : ''
+}
+
+function extractToc() {
+  const headingRegex = /^(#{1,3})\s+(.+)$/gm
+  const headings = []
+  const usedIds = new Set()
+  let match
+
+  while ((match = headingRegex.exec(displayContent.value)) !== null) {
+    const level = match[1].length
+    const text = match[2].replace(/#+$/, '').trim()
+    const id = ensureUniqueId(slugify(text), usedIds)
+    headings.push({ level, text, id })
+  }
+
+  tocList.value = headings
+  activeHeading.value = headings[0]?.id || ''
+}
+
+function scrollToHeading(id) {
+  activeHeading.value = id
+  const heading = contentRef.value?.querySelector(`#${CSS.escape(id)}`)
+
+  if (heading && contentRef.value) {
+    contentRef.value.scrollTo({
+      top: heading.offsetTop - 20,
+      behavior: 'smooth',
+    })
+  }
+}
+
+function handleContentScroll() {
+  if (!contentRef.value || tocList.value.length === 0) {
+    return
+  }
+
+  const containerRect = contentRef.value.getBoundingClientRect()
+  const headings = Array.from(contentRef.value.querySelectorAll('h1, h2, h3'))
+  let currentId = ''
+
+  headings.forEach((heading) => {
+    const rect = heading.getBoundingClientRect()
+    if (rect.top <= containerRect.top + 100) {
+      currentId = heading.id
+    }
+  })
+
+  if (currentId && currentId !== activeHeading.value) {
+    activeHeading.value = currentId
+  }
+}
+
+function handleSearch() {
+  const keyword = searchKeyword.value.trim().toLowerCase()
+
+  if (!keyword) {
+    searchResults.value = []
+    showSearchResults.value = false
+    return
+  }
+
+  searchResults.value = tocList.value
+    .filter((item) => item.text.toLowerCase().includes(keyword))
+    .slice(0, 12)
+  showSearchResults.value = true
+}
+
+function selectSearchResult(result) {
+  scrollToHeading(result.id)
+  showSearchResults.value = false
+  searchKeyword.value = ''
+}
+
+function hideSearchResultsSoon() {
+  window.setTimeout(() => {
+    showSearchResults.value = false
+  }, 200)
+}
+
+function bindImagePreview() {
+  const images = Array.from(contentRef.value?.querySelectorAll('.markdown-body img') || [])
+  const urls = images.map((image) => image.src)
+
+  images.forEach((image, index) => {
+    image.style.cursor = 'zoom-in'
+    image.addEventListener('click', () => {
+      previewImages.value = urls
+      previewIndex.value = index
+      showImageViewer.value = true
+    })
+    image.addEventListener('error', () => {
+      image.classList.add('is-missing')
+      image.alt = `${image.alt || '图片'}（未找到）`
+    })
+  })
+}
+
+async function loadDoc(docId) {
+  const doc = sidebarMenu.find((item) => item.id === docId)
+
+  if (!doc) {
+    return
+  }
+
+  currentDocId.value = docId
+  loading.value = true
+
+  try {
+    docContent.value = doc.content
+    await nextTick()
+    extractToc()
+    await nextTick()
+    contentRef.value?.scrollTo({ top: 0 })
+    bindImagePreview()
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(searchKeyword, handleSearch)
+
+onMounted(() => {
+  loadDoc(currentDocId.value)
+})
+</script>
+
+<style scoped>
+.doc-website {
+  display: flex;
+  flex-direction: column;
+  height: var(--design-height, 100vh);
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 14px 24px 20px;
+  overflow: hidden;
+  background: #f6f8fb;
+}
+
+.doc-navbar {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 24px;
+  flex: 0 0 auto;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 1px solid #e5e7eb;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.navbar-brand-icon {
+  width: 24px;
+  height: 24px;
+  color: #2563eb;
+}
+
+.navbar-search {
+  position: relative;
+  justify-self: center;
+  width: 100%;
+}
+
+.search-dropdown {
+  position: absolute;
+  z-index: 1000;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.search-item:hover {
+  background: #f3f4f6;
+}
+
+.search-icon {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  color: #64748b;
+}
+
+.search-empty {
+  padding: 16px;
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+}
+
+.navbar-search :deep(.el-input__wrapper) {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  box-shadow: none;
+}
+
+.doc-main {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+
+.doc-sidebar {
+  flex: 0 0 280px;
+  width: 280px;
+  min-width: 220px;
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+  background: #fafafa;
+  padding: 16px 0;
+}
+
+.nav-section {
+  margin-bottom: 16px;
+  padding: 0 12px;
+}
+
+.nav-title {
+  margin-bottom: 8px;
+  padding: 0 12px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nav-list,
+.toc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+  color: #374151;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.nav-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.nav-item.active {
+  border-left-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.nav-icon {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+}
+
+.toc-section {
+  padding: 16px 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.toc-header {
+  margin-bottom: 12px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.toc-item {
+  padding: 8px 0 8px 12px;
+  border-left: 2px solid #e5e7eb;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.15s;
+}
+
+.toc-item:hover {
+  border-left-color: #9ca3af;
+  color: #1f2937;
+}
+
+.toc-item.active {
+  margin-right: -12px;
+  margin-left: -12px;
+  padding-right: 12px;
+  padding-left: 24px;
+  border-left-color: #2563eb;
+  border-radius: 0 4px 4px 0;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.toc-item.level-2 {
+  padding-left: 20px;
+}
+
+.toc-item.level-2.active {
+  padding-left: 32px;
+}
+
+.toc-item.level-3 {
+  padding-left: 32px;
+  font-size: 13px;
+}
+
+.toc-item.level-3.active {
+  padding-left: 44px;
+}
+
+.doc-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 32px clamp(36px, 5vw, 88px) 64px;
+  background: #fff;
+}
+
+.markdown-body {
+  max-width: 1120px;
+  margin: 0 auto;
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.markdown-body :deep(h1) {
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-body :deep(h2) {
+  margin: 40px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.markdown-body :deep(h3) {
+  margin: 28px 0 12px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.markdown-body :deep(p) {
+  margin: 0 0 16px;
+  color: #4b5563;
+}
+
+.markdown-body :deep(strong) {
+  color: #111827;
+  font-weight: 600;
+}
+
+.markdown-body :deep(code) {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  color: #1d4ed8;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+}
+
+.markdown-body :deep(pre) {
+  overflow-x: auto;
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: #1f2937;
+}
+
+.markdown-body :deep(pre code) {
+  padding: 0;
+  background: none;
+  color: #e5e7eb;
+}
+
+.markdown-body :deep(ul),
+.markdown-body :deep(ol) {
+  margin: 0 0 16px;
+  padding-left: 24px;
+  color: #4b5563;
+}
+
+.markdown-body :deep(li) {
+  margin-bottom: 8px;
+}
+
+.markdown-body :deep(a) {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.markdown-body :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.markdown-body :deep(blockquote) {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 6px 6px 0;
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.markdown-body :deep(table) {
+  width: 100%;
+  margin: 24px 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-collapse: collapse;
+  border-radius: 8px;
+}
+
+.markdown-body :deep(th),
+.markdown-body :deep(td) {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.markdown-body :deep(th) {
+  background: #f9fafb;
+  color: #111827;
+  font-weight: 600;
+}
+
+.markdown-body :deep(tr:nth-child(even)) {
+  background: #fafafa;
+}
+
+.markdown-body :deep(img) {
+  display: block;
+  max-width: min(100%, 920px);
+  margin: 22px auto;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.markdown-body :deep(img:hover) {
+  border-color: #bfdbfe;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
+}
+
+.markdown-body :deep(img.is-missing) {
+  display: none;
+}
+
+.markdown-body :deep(hr) {
+  margin: 32px 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 920px) {
+  .doc-website {
+    padding: 10px;
+  }
+
+  .doc-navbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    display: flex;
+    padding: 14px 16px;
+  }
+
+  .navbar-search {
+    width: 100%;
+  }
+
+  .doc-main {
+    flex-direction: column;
+  }
+
+  .doc-sidebar {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 280px;
+    border-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .doc-content {
+    padding: 20px;
+  }
+}
+</style>
+
+<style>
+.el-image-viewer__canvas {
+  cursor: default !important;
+}
+
+.el-image-viewer__img {
+  cursor: default !important;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+</style>
+

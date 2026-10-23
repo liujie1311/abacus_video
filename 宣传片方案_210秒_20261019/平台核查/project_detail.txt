@@ -1,0 +1,980 @@
+<template>
+  <section class="project-detail-view">
+    <div class="project-detail-head">
+      <div class="project-detail-search">
+        <span class="project-detail-tab">任务</span>
+        <div class="project-detail-search-actions">
+          <el-input
+            v-model="projectTemplateKeyword"
+            :prefix-icon="Search"
+            clearable
+            placeholder="请输入内容"
+            @keyup.enter="searchProjectTemplates"
+          />
+          <el-button type="primary" @click="searchProjectTemplates">搜索</el-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-workspace" v-loading="projectDetailLoading">
+      <button type="button" class="workflow-start-tile" @click="openProjectTemplates">
+        <span class="workflow-start-plus">
+          <el-icon><Plus /></el-icon>
+        </span>
+        <strong>新建任务</strong>
+      </button>
+
+      <section class="project-template-panel">
+        <div v-if="visibleProjectTemplates.length" class="project-template-grid">
+          <article
+            v-for="template in visibleProjectTemplates"
+            :key="template.id"
+            class="template-choice-card"
+            @click="openTemplateWorkflowConfig(template, { mode: 'edit' })"
+          >
+            <div class="template-choice-head">
+              <div class="template-choice-id-wrap">
+                <el-tooltip :content="template.id || '-'" popper-class="i18n-skip-popper" placement="top" :show-after="300">
+                  <span class="template-choice-id">
+                    <span>ID</span>
+                    <strong>{{ template.id || '-' }}</strong>
+                  </span>
+                </el-tooltip>
+                <el-tooltip content="复制 ID" placement="top" :show-after="300">
+                  <el-button
+                    class="id-copy-button"
+                    text
+                    :icon="CopyDocument"
+                    aria-label="复制模板 ID"
+                    @click.stop="copyId(template.id)"
+                  />
+                </el-tooltip>
+              </div>
+            </div>
+
+            <div class="template-choice-copy">
+              <el-tooltip
+                :content="template.name || '未命名模板'"
+                :popper-class="template.name ? 'i18n-skip-popper' : ''"
+                placement="top"
+                :show-after="300"
+              >
+                <h3 :data-i18n-skip="template.name ? true : undefined">{{ template.name || '未命名模板' }}</h3>
+              </el-tooltip>
+              <el-tooltip
+                :content="template.description || '暂无描述'"
+                :popper-class="template.description ? 'i18n-skip-popper' : ''"
+                placement="top"
+                :show-after="300"
+              >
+                <p :data-i18n-skip="template.description ? true : undefined">{{ template.description || '暂无描述' }}</p>
+              </el-tooltip>
+            </div>
+
+            <div class="template-choice-time">
+              <span>
+                <el-icon><Clock /></el-icon>
+                创建时间
+              </span>
+              <strong>{{ formatDate(template.created_at || template.updated_at) }}</strong>
+            </div>
+
+            <div class="template-choice-tags">
+              <el-tag
+                v-for="tag in getTemplateTags(template)"
+                :key="tag"
+                size="small"
+                effect="plain"
+              >
+                <span :data-i18n-skip="translateKnown(tag) === tag ? true : undefined">
+                  {{ translateKnown(tag) }}
+                </span>
+              </el-tag>
+            </div>
+
+            <div class="template-choice-actions">
+              <el-button
+                type="primary"
+                :icon="VideoPlay"
+                :loading="projectAction.executingTemplateId === template.id"
+                @click.stop="executeProjectTemplate(template)"
+              >
+                执行
+              </el-button>
+              <el-button plain :icon="Edit" @click.stop="openTemplateEdit(template)">编辑</el-button>
+              <el-button
+                plain
+                :icon="Document"
+                :loading="projectAction.previewingTemplateId === template.id"
+                @click.stop="openTemplatePreview(template)"
+              >
+                预览
+              </el-button>
+              <el-button plain :icon="View" @click.stop="openTemplateWorkflowDetail(template)">运行详情</el-button>
+              <el-button plain :icon="DocumentCopy" @click.stop="openCopyTemplateDialog(template)">复制</el-button>
+              <el-button
+                type="danger"
+                plain
+                :icon="Delete"
+                :loading="projectAction.deletingTemplateId === template.id"
+                @click.stop="removeProjectTemplate(template)"
+              >
+                删除
+              </el-button>
+            </div>
+          </article>
+        </div>
+
+        <div v-else-if="canShowTemplateEmpty" class="empty-block template-empty">
+          <span>当前项目暂无模板</span>
+        </div>
+      </section>
+    </div>
+
+    <div v-if="projectTemplateFilterReady" class="pagination-row project-template-pagination">
+      <el-pagination
+        background
+        layout="sizes, prev, pager, next, jumper"
+        :current-page="templateStore.currentPage"
+        :page-size="templateStore.pagination.limit"
+        :page-sizes="[50, 100, 200]"
+        :total="templateStore.pagination.total"
+        @current-change="changeProjectTemplatePage"
+        @size-change="changeProjectTemplatePageSize"
+      />
+    </div>
+
+    <el-dialog
+      v-model="copyTemplateDialog.visible"
+      title="复制到项目"
+      width="520px"
+      append-to-body
+      destroy-on-close
+    >
+      <el-form label-position="top">
+        <el-form-item label="模板名称" required>
+          <el-input
+            v-model="copyTemplateDialog.name"
+            clearable
+            maxlength="80"
+            placeholder="请输入复制后的模板名称"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="复制到项目" required>
+          <el-select
+            v-model="copyTemplateDialog.projectId"
+            filterable
+            placeholder="请选择项目"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="project in projectStore.projects"
+              :key="project.id"
+              :label="project.name || project.id"
+              :value="project.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="copyTemplateDialog.visible = false">取消</el-button>
+        <el-button type="primary" :loading="copyTemplateDialog.loading" @click="confirmCopyTemplate">
+          确认复制
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <WorkflowYamlPreviewDialog
+      v-model="templatePreview.visible"
+      :value="templatePreview.definition"
+    />
+
+    <!-- 新建任务抽屉 -->
+    <WorkflowConfigDrawer
+      ref="workflowDrawerRef"
+      v-model="workflowDrawerVisible"
+      :project-id="activeProjectId"
+      @created="handleWorkflowCreated"
+      @updated="handleWorkflowCreated"
+    />
+  </section>
+</template>
+
+<script setup>
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Clock,
+  CopyDocument,
+  Delete,
+  Document,
+  DocumentCopy,
+  Edit,
+  Plus,
+  Search,
+  View,
+  VideoPlay,
+} from '@element-plus/icons-vue'
+
+import { useProjectStore } from '@/stores/projects'
+import { useTemplateStore } from '@/stores/templates'
+import { translateKnownText } from '@/i18n'
+import { useAppStore } from '@/stores/app'
+import { copyTextToClipboard } from '@/utils/clipboard'
+import { formatDate } from '@/utils/format'
+import { createTemplate } from '@/api/templates'
+import {
+  buildTemplatePayload,
+  buildTimedTemplateName,
+  buildWorkflowRoute,
+  getCreatedTemplateId,
+  getWorkflowId,
+} from '@/utils/templateExecution'
+import WorkflowConfigDrawer from './components/WorkflowConfigDrawer.vue'
+import WorkflowYamlPreviewDialog from './components/WorkflowYamlPreviewDialog.vue'
+
+const route = useRoute()
+const router = useRouter()
+const appStore = useAppStore()
+const projectStore = useProjectStore()
+const templateStore = useTemplateStore()
+
+const projectAction = reactive({
+  executingTemplateId: '',
+  deletingTemplateId: '',
+  previewingTemplateId: '',
+})
+
+const templatePreview = reactive({
+  visible: false,
+  definition: {},
+})
+
+const copyTemplateDialog = reactive({
+  visible: false,
+  loading: false,
+  template: null,
+  projectId: '',
+  name: '',
+})
+
+// 任务配置抽屉
+const workflowDrawerVisible = ref(false)
+const workflowDrawerRef = ref(null)
+const loadedProjectTemplateProjectId = ref('')
+const projectTemplateLoadSerial = ref(0)
+const projectRouteLoadSerial = ref(0)
+const projectRouteLoading = ref(true)
+
+const activeProjectId = computed(() => String(route.params.projectId || route.query.project_id || route.query.projectId || '').trim())
+const activeProject = computed(() => {
+  if (!activeProjectId.value) {
+    return null
+  }
+
+  return projectStore.projects.find((project) => String(project.id) === activeProjectId.value) || projectStore.current
+})
+const projectTemplateFilterReady = computed(() => (
+  loadedProjectTemplateProjectId.value === activeProjectId.value &&
+  templateStore.filters.projectId === activeProjectId.value
+))
+const projectDetailLoading = computed(() => (
+  projectRouteLoading.value || projectStore.detailLoading || templateStore.loading
+))
+const visibleProjectTemplates = computed(() => (
+  projectTemplateFilterReady.value ? templateStore.templates : []
+))
+const canShowTemplateEmpty = computed(() => (
+  projectTemplateFilterReady.value && !templateStore.loading && !visibleProjectTemplates.value.length
+))
+const projectTemplateKeyword = computed({
+  get: () => templateStore.filters.keyword,
+  set: (value) => {
+    templateStore.filters.keyword = String(value || '')
+  },
+})
+
+function getTemplateTags(template, limit = 3) {
+  return Array.isArray(template?.tags) ? template.tags.slice(0, limit) : []
+}
+
+function translateKnown(value) {
+  return translateKnownText(value, appStore.language)
+}
+
+async function copyId(id) {
+  const value = String(id || '').trim()
+
+  if (!value) {
+    ElMessage.warning('暂无可复制的 ID')
+    return
+  }
+
+  try {
+    await copyTextToClipboard(value)
+    ElMessage.success('ID 已复制')
+  } catch (error) {
+    ElMessage.error(error.message || '复制失败')
+  }
+}
+
+async function searchProjectTemplates() {
+  await templateStore.loadTemplates({
+    project_id: activeProjectId.value,
+    is_builtin: undefined,
+    offset: 0,
+  })
+}
+
+function openProjectTemplates() {
+  workflowDrawerVisible.value = true
+}
+
+function openTemplateWorkflowConfig(template, options = {}) {
+  if (!template?.id) {
+    return
+  }
+
+  workflowDrawerVisible.value = true
+  workflowDrawerRef.value?.openWithTemplate(template, options)
+}
+
+function isPlainRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+async function executeProjectTemplate(template) {
+  if (!template?.id) {
+    ElMessage.warning('模板 ID 缺失，无法执行')
+    return
+  }
+
+  try {
+    projectAction.executingTemplateId = template.id
+    const projectId = activeProjectId.value
+    const result = await templateStore.execute(template.id, {
+      name: buildTimedTemplateName(template.name),
+      parameters: isPlainRecord(template.parameters) ? template.parameters : {},
+      configs: isPlainRecord(template.configs) ? template.configs : {},
+      project_id: projectId || undefined,
+    })
+    const workflowId = getWorkflowId(result)
+
+    ElMessage.success(result?.message || '模板已执行')
+    router.push(buildWorkflowRoute(workflowId, projectId, {
+      templateId: template.id,
+      preferList: true,
+    }))
+  } catch (error) {
+    if (!error?.response) {
+      ElMessage.error(error.message || '模板执行失败')
+    }
+  } finally {
+    projectAction.executingTemplateId = ''
+  }
+}
+
+function openTemplateWorkflowDetail(template) {
+  router.push(buildWorkflowRoute('', activeProjectId.value, {
+    templateId: template?.id,
+  }))
+}
+
+async function getFullTemplate(template) {
+  if (!template?.id) {
+    return null
+  }
+
+  if (template.definition) {
+    return template
+  }
+
+  await templateStore.selectTemplate(template.id)
+  return templateStore.current
+}
+
+async function openTemplatePreview(template) {
+  if (!template?.id) {
+    ElMessage.warning('模板 ID 缺失，无法预览')
+    return
+  }
+
+  try {
+    projectAction.previewingTemplateId = template.id
+    const fullTemplate = await getFullTemplate(template)
+    templatePreview.definition = fullTemplate?.definition || {}
+    templatePreview.visible = true
+  } catch (error) {
+    if (!error?.response) {
+      ElMessage.error(error.message || '模板预览加载失败')
+    }
+  } finally {
+    projectAction.previewingTemplateId = ''
+  }
+}
+
+function openCopyTemplateDialog(template) {
+  if (!template?.id) {
+    ElMessage.warning('模板 ID 缺失，无法复制')
+    return
+  }
+
+  copyTemplateDialog.template = template
+  copyTemplateDialog.projectId = activeProjectId.value || ''
+  copyTemplateDialog.name = buildTimedTemplateName(template.name || '未命名模板')
+  copyTemplateDialog.visible = true
+
+  if (!projectStore.projects.length && !projectStore.loading) {
+    projectStore.loadProjects().catch(() => {})
+  }
+}
+
+async function confirmCopyTemplate() {
+  const targetProjectId = String(copyTemplateDialog.projectId || '').trim()
+  const templateName = String(copyTemplateDialog.name || '').trim()
+
+  if (!targetProjectId) {
+    ElMessage.warning('请选择项目')
+    return
+  }
+
+  if (!templateName) {
+    ElMessage.warning('请输入模板名称')
+    return
+  }
+
+  try {
+    copyTemplateDialog.loading = true
+    const sourceTemplate = await getFullTemplate(copyTemplateDialog.template)
+
+    if (!sourceTemplate?.definition) {
+      throw new Error('模板内容缺失，无法复制')
+    }
+
+    const result = await createTemplate({
+      ...buildTemplatePayload(sourceTemplate, targetProjectId),
+      name: templateName,
+    })
+    const createdId = getCreatedTemplateId(result)
+
+    copyTemplateDialog.visible = false
+    ElMessage.success('模板已复制')
+
+    if (targetProjectId === activeProjectId.value) {
+      await reloadProjectTemplates()
+    } else if (createdId) {
+      await templateStore.loadTemplates({
+        project_id: activeProjectId.value,
+        is_builtin: undefined,
+      })
+    }
+  } catch (error) {
+    if (!error?.response) {
+      ElMessage.error(error.message || '模板复制失败')
+    }
+  } finally {
+    copyTemplateDialog.loading = false
+  }
+}
+
+async function removeProjectTemplate(template) {
+  if (!template?.id) {
+    return
+  }
+
+  const confirmed = await ElMessageBox.confirm(`确认删除模板「${template.name || template.id}」？`, '删除模板', {
+    type: 'warning',
+  })
+    .then(() => true)
+    .catch(() => false)
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    projectAction.deletingTemplateId = template.id
+    await templateStore.remove(template.id)
+    await reloadProjectTemplates()
+    ElMessage.success('模板已删除')
+  } finally {
+    projectAction.deletingTemplateId = ''
+  }
+}
+
+function openTemplateEdit(template) {
+  if (!template?.id) {
+    return
+  }
+
+  openTemplateWorkflowConfig(template, { mode: 'edit' })
+}
+
+async function loadProjectTemplates(projectId, options = {}) {
+  if (!projectId) {
+    loadedProjectTemplateProjectId.value = ''
+    return
+  }
+
+  const { resetPage = true } = options
+  const nextOffset = resetPage ? 0 : templateStore.pagination.offset
+  const loadSerial = projectTemplateLoadSerial.value + 1
+
+  projectTemplateLoadSerial.value = loadSerial
+
+  if (loadedProjectTemplateProjectId.value !== projectId) {
+    loadedProjectTemplateProjectId.value = ''
+  }
+
+  templateStore.filters.projectId = projectId
+  templateStore.filters.keyword = ''
+  templateStore.filters.builtin = ''
+  templateStore.pagination.offset = nextOffset
+
+  await templateStore.loadTemplates({
+    project_id: projectId,
+    is_builtin: undefined,
+    offset: nextOffset,
+  })
+
+  if (loadSerial === projectTemplateLoadSerial.value && activeProjectId.value === projectId) {
+    loadedProjectTemplateProjectId.value = projectId
+  }
+}
+
+async function reloadProjectTemplates() {
+  await loadProjectTemplates(activeProjectId.value, { resetPage: false })
+}
+
+async function handleWorkflowCreated(result) {
+  // 刷新模板列表
+  await reloadProjectTemplates()
+}
+
+async function changeProjectTemplatePage(page) {
+  await templateStore.loadTemplates({
+    project_id: activeProjectId.value,
+    is_builtin: undefined,
+    offset: (page - 1) * templateStore.pagination.limit,
+  })
+}
+
+async function changeProjectTemplatePageSize(size) {
+  await templateStore.loadTemplates({
+    project_id: activeProjectId.value,
+    is_builtin: undefined,
+    limit: size,
+    offset: 0,
+  })
+}
+
+async function syncProjectRoute(projectId) {
+  const routeLoadSerial = projectRouteLoadSerial.value + 1
+
+  projectRouteLoadSerial.value = routeLoadSerial
+  projectRouteLoading.value = true
+  loadedProjectTemplateProjectId.value = ''
+
+  try {
+    if (!projectId) {
+      projectStore.current = null
+      templateStore.setProjectFilter('')
+      return
+    }
+
+    const localProject = projectStore.projects.find((project) => String(project.id) === projectId)
+
+    if (localProject) {
+      projectStore.current = localProject
+    } else {
+      await projectStore.selectProject(projectId)
+    }
+
+    await loadProjectTemplates(projectId)
+  } finally {
+    if (routeLoadSerial === projectRouteLoadSerial.value) {
+      projectRouteLoading.value = false
+    }
+  }
+}
+
+onMounted(async () => {
+  await projectStore.loadProjects()
+  await syncProjectRoute(activeProjectId.value)
+})
+
+watch(activeProjectId, syncProjectRoute)
+</script>
+
+<style scoped>
+.project-detail-view {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  height: calc(var(--design-height, 100vh) - 124px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.project-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+  padding: 10px 16px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.project-detail-search {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  gap: 16px;
+  min-width: 360px;
+}
+
+.project-detail-tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 2px solid var(--app-primary);
+  color: var(--app-primary-strong);
+  font-size: var(--app-font-size);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.project-detail-search-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(420px, 42vw);
+  min-width: 300px;
+}
+
+.project-detail-search-actions :deep(.el-input) {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-detail-search-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+.project-detail-id-wrap,
+.template-choice-id-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.project-detail-id-wrap {
+  max-width: min(520px, 54vw);
+}
+
+.template-choice-id-wrap {
+  max-width: 100%;
+}
+
+.project-detail-id,
+.template-choice-id {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: calc(100% - 30px);
+  gap: 7px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size);
+  line-height: 1.45;
+}
+
+.project-detail-id span,
+.project-detail-id strong,
+.template-choice-id span,
+.template-choice-id strong {
+  color: var(--app-text-muted);
+  font-family: var(--app-font-family);
+  font-weight: 400;
+}
+
+.project-detail-id strong,
+.template-choice-id strong {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.id-copy-button.el-button {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  color: var(--app-text-soft);
+}
+
+.id-copy-button.el-button:hover {
+  color: var(--app-primary-strong);
+  background: var(--app-primary-soft);
+}
+
+.id-copy-button :deep(.el-icon) {
+  margin: 0;
+  font-size: 14px;
+}
+
+.project-workspace {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(470px, 1fr));
+  align-items: stretch;
+  align-content: start;
+  grid-auto-rows: minmax(408px, auto);
+  gap: 34px 28px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 2px 34px;
+}
+
+.workflow-start-tile {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 408px;
+  padding: 24px;
+  border: 2px dashed rgba(var(--app-primary-rgb), 0.72);
+  border-radius: var(--app-radius);
+  background: linear-gradient(180deg, rgba(var(--app-primary-rgb), 0.08), rgba(var(--app-primary-rgb), 0.03));
+  color: var(--app-text);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.workflow-start-tile:hover {
+  border-color: var(--app-primary);
+  box-shadow: var(--app-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.workflow-start-plus {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  background: var(--app-primary);
+  color: #fff;
+  font-size: 28px;
+  box-shadow: 0 18px 34px rgba(var(--app-primary-rgb), 0.24);
+}
+
+.workflow-start-tile strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.workflow-start-tile small {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.project-template-panel {
+  display: contents;
+  min-width: 0;
+}
+
+.project-template-grid {
+  display: contents;
+}
+
+.template-choice-card {
+  display: grid;
+  position: relative;
+  grid-template-rows: auto auto auto minmax(28px, auto) auto;
+  gap: 14px;
+  height: 100%;
+  min-height: 408px;
+  padding: 26px 24px 22px;
+  overflow: hidden;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.template-choice-card:hover {
+  border-color: var(--app-primary);
+  box-shadow: var(--app-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.template-choice-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.template-choice-copy {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.template-choice-copy h3 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-choice-copy p {
+  display: -webkit-box;
+  min-height: 3.2em;
+  max-height: 3.2em;
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.template-choice-time {
+  display: grid;
+  grid-template-columns: minmax(118px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-border-soft);
+}
+
+.template-choice-time span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.template-choice-time strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-small);
+  font-weight: 500;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-choice-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 24px;
+  overflow: hidden;
+}
+
+.template-choice-tags :deep(.el-tag) {
+  max-width: 98px;
+  border-color: rgba(var(--app-primary-rgb), 0.16);
+  background: var(--app-primary-soft);
+  color: var(--app-primary-strong);
+}
+
+.template-choice-tags :deep(.el-tag__content) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-choice-actions {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 40px);
+  gap: 10px 8px;
+  align-self: end;
+}
+
+.template-choice-actions :deep(.el-button) {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  font-weight: 700;
+}
+
+.template-choice-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+.template-empty {
+  min-height: 408px;
+}
+
+@media (max-width: 980px) {
+  .project-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-start-tile {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 760px) {
+  .project-detail-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-detail-search {
+    align-items: stretch;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .project-detail-search-actions {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .project-detail-id,
+  .project-detail-id-wrap {
+    max-width: 100%;
+  }
+
+}
+</style>
+

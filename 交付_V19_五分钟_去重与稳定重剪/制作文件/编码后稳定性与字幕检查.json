@@ -1,0 +1,272 @@
+{
+  "encoded_opening_stability": [
+    {
+      "start": 0,
+      "asset": "G01",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 8.943343709688634e-05
+    },
+    {
+      "start": 4,
+      "asset": "G02",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.01695881597697735
+    },
+    {
+      "start": 7,
+      "asset": "G03",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.39604854583740234
+    },
+    {
+      "start": 10,
+      "asset": "G04",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.004833132028579712
+    },
+    {
+      "start": 22,
+      "asset": "G05",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.002604748820886016
+    },
+    {
+      "start": 25,
+      "asset": "G06",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.0026718240696936846
+    },
+    {
+      "start": 27.5,
+      "asset": "G07",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.0018184799700975418
+    },
+    {
+      "start": 30,
+      "asset": "G08",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.004799594637006521
+    },
+    {
+      "start": 32,
+      "asset": "G09",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.23776625096797943
+    },
+    {
+      "start": 35,
+      "asset": "G10",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.004426955245435238
+    },
+    {
+      "start": 38,
+      "asset": "G11",
+      "frames_checked": 5,
+      "best_translation_pixels": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "max_mean_luma_change": 0.0044530401937663555
+    }
+  ],
+  "subtitle_count": 88,
+  "subtitle_overlap": false,
+  "subtitles_within_frame": true,
+  "note": "Compression can change pixel values slightly; all tested consecutive opening frames have zero best-fit integer translation."
+}

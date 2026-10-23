@@ -1,0 +1,92 @@
+{
+  "method": "Blender local procedural 3D modelling and Cycles rendering",
+  "api_used": false,
+  "scientific_status": "Conceptual illustrations; not experimental records, trajectories, charge-density calculations or material performance data.",
+  "assets": [
+    {
+      "id": "G01",
+      "image": "G01.png",
+      "editable_scene": "G01.blend"
+    },
+    {
+      "id": "G02",
+      "image": "G02.png",
+      "editable_scene": "G02.blend"
+    },
+    {
+      "id": "G03",
+      "image": "G03.png",
+      "editable_scene": "G03.blend"
+    },
+    {
+      "id": "G04",
+      "image": "G04.png",
+      "editable_scene": "G04.blend"
+    },
+    {
+      "id": "G05",
+      "image": "G05.png",
+      "editable_scene": "G05.blend"
+    },
+    {
+      "id": "G06",
+      "image": "G06.png",
+      "editable_scene": "G06.blend"
+    },
+    {
+      "id": "G07",
+      "image": "G07.png",
+      "editable_scene": "G07.blend"
+    },
+    {
+      "id": "G08",
+      "image": "G08.png",
+      "editable_scene": "G08.blend"
+    },
+    {
+      "id": "G09",
+      "image": "G09.png",
+      "editable_scene": "G09.blend"
+    },
+    {
+      "id": "G10",
+      "image": "G10.png",
+      "editable_scene": "G10.blend"
+    },
+    {
+      "id": "G11",
+      "image": "G11.png",
+      "editable_scene": "G11.blend"
+    },
+    {
+      "id": "G12",
+      "image": "G12.png",
+      "editable_scene": "G12.blend"
+    },
+    {
+      "id": "G13",
+      "image": "G13.png",
+      "editable_scene": "G13.blend"
+    },
+    {
+      "id": "G14",
+      "image": "G14.png",
+      "editable_scene": "G14.blend"
+    }
+  ],
+  "status": "14 local 3D concept renders completed",
+  "used_in_video": [
+    "G01",
+    "G02",
+    "G03",
+    "G04",
+    "G05",
+    "G06",
+    "G07",
+    "G08",
+    "G09",
+    "G10",
+    "G11",
+    "G14"
+  ]
+}

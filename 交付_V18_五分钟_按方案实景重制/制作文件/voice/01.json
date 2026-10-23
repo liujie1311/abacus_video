@@ -1,0 +1,296 @@
+{
+  "text": "第一性原理计算，从原子和电子层面研究材料；AI辅助规划与分析。ABACUSLab，由合肥综合性国家科学中心人工智能研究院开发，以中国科学技术大学团队牵头研发的国产开源软件ABACUS为核心，融合专业计算、标准流程与人工智能，支持材料研究。",
+  "spoken_text": "第一性原理计算，从原子和电子层面研究材料；AI辅助规划与分析。ABACUS LAB，由合肥综合性国家科学中心人工智能研究院开发，以中国科学技术大学团队牵头研发的国产开源软件ABACUS为核心，融合专业计算、标准流程与人工智能，支持材料研究。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 3750000,
+      "text": "第一性"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 4875000,
+      "duration": 2750000,
+      "text": "原理"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 7750000,
+      "duration": 3625000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 14125000,
+      "duration": 2125000,
+      "text": "从"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 16375000,
+      "duration": 4000000,
+      "text": "原子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 20500000,
+      "duration": 1625000,
+      "text": "和"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 22250000,
+      "duration": 3625000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 26000000,
+      "duration": 4375000,
+      "text": "层面"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 30625000,
+      "duration": 3250000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 34000000,
+      "duration": 4500000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 42250000,
+      "duration": 3500000,
+      "text": "AI"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 45875000,
+      "duration": 4125000,
+      "text": "辅助"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 50125000,
+      "duration": 4875000,
+      "text": "规划"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 55250000,
+      "duration": 1250000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 56625000,
+      "duration": 4375000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 66750000,
+      "duration": 4375000,
+      "text": "ABACUS"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 71250000,
+      "duration": 2000000,
+      "text": "LAB"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 76250000,
+      "duration": 1750000,
+      "text": "由"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 78125000,
+      "duration": 4125000,
+      "text": "合肥"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 82375000,
+      "duration": 5625000,
+      "text": "综合性"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 88250000,
+      "duration": 3125000,
+      "text": "国家"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 91500000,
+      "duration": 3000000,
+      "text": "科学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 94625000,
+      "duration": 3750000,
+      "text": "中心"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 99500000,
+      "duration": 6625000,
+      "text": "人工智能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 106250000,
+      "duration": 4625000,
+      "text": "研究院"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 111000000,
+      "duration": 4000000,
+      "text": "开发"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 117375000,
+      "duration": 1875000,
+      "text": "以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 119375000,
+      "duration": 13375000,
+      "text": "中国科学技术大学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 132875000,
+      "duration": 3875000,
+      "text": "团队"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 138000000,
+      "duration": 4250000,
+      "text": "牵头"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 142375000,
+      "duration": 4000000,
+      "text": "研发"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 146375000,
+      "duration": 1375000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 148000000,
+      "duration": 4125000,
+      "text": "国产"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 152375000,
+      "duration": 2875000,
+      "text": "开源"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 155375000,
+      "duration": 3875000,
+      "text": "软件"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 160250000,
+      "duration": 4875000,
+      "text": "ABACUS"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 165250000,
+      "duration": 1625000,
+      "text": "为"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 167000000,
+      "duration": 3625000,
+      "text": "核心"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 173500000,
+      "duration": 4250000,
+      "text": "融合"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 178000000,
+      "duration": 3375000,
+      "text": "专业"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 181500000,
+      "duration": 3750000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 187375000,
+      "duration": 3625000,
+      "text": "标准"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 191125000,
+      "duration": 4250000,
+      "text": "流程"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 196250000,
+      "duration": 1875000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 198250000,
+      "duration": 6750000,
+      "text": "人工智能"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 206125000,
+      "duration": 4000000,
+      "text": "支持"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 210250000,
+      "duration": 4375000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 214750000,
+      "duration": 4625000,
+      "text": "研究"
+    }
+  ]
+}

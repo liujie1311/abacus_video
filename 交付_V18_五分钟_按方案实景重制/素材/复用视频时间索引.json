@@ -1,0 +1,128 @@
+[
+  {
+    "key": "old_home",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 8,
+    "duration": 6,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_templates",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 15,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_cards",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 24,
+    "duration": 7,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_reuse",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 32,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_project",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 41,
+    "duration": 6,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_workflow",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 61,
+    "duration": 6,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_config",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 81,
+    "duration": 9,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_pdos",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 101,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_optical",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 111,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_analysis",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 171,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_suggest",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 180,
+    "duration": 7,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_recap",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 196,
+    "duration": 5,
+    "frames_per_second": 15
+  },
+  {
+    "key": "old_msd",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V16_210秒_MSD固液态对照标注\\ABACUSLab_V16_3分30秒_MSD状态说明.mp4",
+    "start": 161,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "ref_prompt",
+    "source": "C:\\Users\\13118\\xwechat_files\\wxid_zml5uciivw6v22_70bd\\msg\\video\\2026-10\\0da312f692b46fe2d0afac91646097cf.mp4",
+    "start": 17,
+    "duration": 7,
+    "frames_per_second": 15
+  },
+  {
+    "key": "ref_plan",
+    "source": "C:\\Users\\13118\\xwechat_files\\wxid_zml5uciivw6v22_70bd\\msg\\video\\2026-10\\0da312f692b46fe2d0afac91646097cf.mp4",
+    "start": 26,
+    "duration": 7,
+    "frames_per_second": 15
+  },
+  {
+    "key": "ref_task",
+    "source": "C:\\Users\\13118\\xwechat_files\\wxid_zml5uciivw6v22_70bd\\msg\\video\\2026-10\\0da312f692b46fe2d0afac91646097cf.mp4",
+    "start": 36,
+    "duration": 2,
+    "frames_per_second": 15
+  },
+  {
+    "key": "test",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V18_五分钟_按方案实景重制\\素材\\网络原始素材\\mechanical.mp4",
+    "start": 12,
+    "duration": 8,
+    "frames_per_second": 15
+  },
+  {
+    "key": "test2",
+    "source": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V18_五分钟_按方案实景重制\\素材\\网络原始素材\\mechanical.mp4",
+    "start": 39,
+    "duration": 6,
+    "frames_per_second": 15
+  }
+]

@@ -1,0 +1,50 @@
+{
+  "animation_count": 7,
+  "total_seconds": 76.0,
+  "all_decode_checks_passed": true,
+  "animations": [
+    {
+      "file": "03_新增动画\\M01_微观晶体结构_12秒.mp4",
+      "seconds": 12.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M02_材料探索空间_10秒.mp4",
+      "seconds": 10.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M03_研发迭代流程_10秒.mp4",
+      "seconds": 10.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M04_AI与计算流程_12秒.mp4",
+      "seconds": 12.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M05_计算支撑设计_12秒.mp4",
+      "seconds": 12.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M06_品牌循环背景_10秒.mp4",
+      "seconds": 10.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    },
+    {
+      "file": "03_新增动画\\M07_纯铝案例_MSD原图_10秒.mp4",
+      "seconds": 10.0,
+      "resolution": "1920x1080",
+      "decode": "pass"
+    }
+  ],
+  "contact_sheet": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\五分钟宣传片_补充素材_20261023\\05_预览与索引\\新增动画总览.jpg"
+}

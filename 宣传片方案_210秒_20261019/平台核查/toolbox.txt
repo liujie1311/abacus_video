@@ -1,0 +1,2121 @@
+<template>
+  <div class="page-stack toolbox-page">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">工具箱</h1>
+        <div class="page-subtitle">常用本地辅助工具：结构文件转换、ABACUS INPUT 配置和 PYATB Input 生成。</div>
+      </div>
+    </div>
+
+    <section class="toolbox-shell">
+      <el-tabs v-model="activeTool" class="toolbox-tabs">
+        <div class="toolbox-tab-hint">
+          <strong>{{ activeToolHint.title }}</strong>
+          <span>{{ activeToolHint.description }}</span>
+        </div>
+        <el-tab-pane label="VASP  → ABACUS" name="vasp">
+          <div class="vasp-toolbox-grid" :class="{ 'has-output': hasVaspSourceFiles }">
+            <section class="tool-panel vasp-directory-panel">
+              <div class="tool-panel-head">
+                <div>
+                  <h2 class="section-heading">VASP 计算目录</h2>
+                  <p>选择包含 POSCAR、INCAR 和 KPOINTS 的目录，系统会自动读取文件；确认配置后再生成 ABACUS 输入文件。</p>
+                </div>
+              </div>
+
+              <el-radio-group
+                v-model="vaspState.sourceMode"
+                class="source-mode-switch"
+                :disabled="vaspState.converting || vaspState.reading"
+                @change="setVaspSourceMode"
+              >
+                <el-radio-button value="local">本机目录</el-radio-button>
+                <el-radio-button value="path">宿主机目录</el-radio-button>
+              </el-radio-group>
+
+              <label
+                v-if="vaspState.sourceMode === 'local'"
+                class="vasp-directory-drop"
+                :class="{ selected: hasVaspDirectorySelection, converting: vaspState.converting }"
+              >
+                <input
+                  :key="vaspState.inputKey"
+                  class="file-input-native"
+                  type="file"
+                  webkitdirectory
+                  directory
+                  multiple
+                  @change="setVaspDirectory($event)"
+                />
+                <span class="vasp-directory-icon">
+                  <el-icon><FolderOpened /></el-icon>
+                </span>
+                <span class="vasp-directory-main">{{ vaspState.directoryName || '选择 VASP 计算目录' }}</span>
+                <span class="vasp-directory-meta">
+                  {{ hasVaspDirectorySelection ? '已识别目录内容，请完成配置后点击转换。' : '目录中应包含 POSCAR、INCAR、KPOINTS 文件。' }}
+                </span>
+              </label>
+
+              <div v-else class="host-path-input vasp-host-path-input">
+                <el-input
+                  :model-value="vaspState.hostPath"
+                  clearable
+                  :disabled="vaspState.converting || vaspState.reading"
+                  placeholder="/root/.abacuslab/runs/.../vasp-calculation"
+                  @update:model-value="setVaspHostPath"
+                  @keyup.enter="readVaspHostDirectory"
+                >
+                  <template #prefix>
+                    <el-icon><FolderOpened /></el-icon>
+                  </template>
+                </el-input>
+                <div class="form-help">填写后端所在宿主机上的 VASP 计算目录，系统会读取其中的 POSCAR、INCAR 和 KPOINTS。</div>
+                <el-button
+                  type="primary"
+                  :icon="Search"
+                  :loading="vaspState.reading"
+                  :disabled="vaspState.converting"
+                  @click="readVaspHostDirectory"
+                >
+                  读取目录
+                </el-button>
+              </div>
+
+              <section v-if="vaspFileStatuses.length" class="vasp-files-summary" aria-label="已读取的 VASP 文件">
+                <input
+                  ref="vaspIncarStructureInput"
+                  :key="vaspState.incarStructureInputKey"
+                  class="vasp-inline-file-input"
+                  type="file"
+                  :disabled="vaspState.converting || vaspState.reading"
+                  @change="setVaspIncarStructureFile($event)"
+                />
+                <div class="vasp-files-summary-head">
+                  <h2 class="section-heading">已读取的文件</h2>
+                  <span>确认下方配置后，统一生成对应的 ABACUS 文件。</span>
+                </div>
+                <div class="vasp-files-summary-list">
+                  <div
+                    v-for="item in vaspFileStatuses"
+                    :key="item.key"
+                    class="vasp-file-summary-item"
+                    :class="{
+                      'has-config': item.configAction,
+                      'has-inline-upload': item.key === 'incar',
+                    }"
+                  >
+                    <div>
+                      <strong>{{ item.source }}</strong>
+                      <span>{{ item.description }}</span>
+                    </div>
+                    <div
+                      v-if="item.key === 'incar'"
+                      class="vasp-incar-upload-control"
+                    >
+                      <div class="vasp-incar-upload-file">
+                        <span class="vasp-incar-upload-file-icon">
+                          <el-icon><Document /></el-icon>
+                        </span>
+                        <div class="vasp-incar-upload-file-body">
+                          <strong>{{ vaspIncarStructureInfo.title }}</strong>
+                          <small>{{ vaspIncarStructureInfo.subtitle }}</small>
+                        </div>
+                      </div>
+                      <el-button
+                        type="primary"
+                        :disabled="vaspState.converting || vaspState.reading"
+                        @click="selectVaspIncarStructureFile"
+                      >
+                        {{ vaspIncarStructureActionLabel }}
+                      </el-button>
+                      <small>可选：STRU/POSCAR/CIF 均可，用于校验 MAGMOM 并决定 nspin。</small>
+                    </div>
+                    <el-button
+                      v-else-if="item.configAction"
+                      class="vasp-file-config-button"
+                      type="primary"
+                      :disabled="vaspState.converting || vaspState.reading"
+                      @click="openVaspFileConfig(item.key)"
+                    >
+                      {{ item.configAction }}
+                    </el-button>
+                    <div class="vasp-file-summary-actions">
+                      <el-tag v-if="item.status !== 'idle'" size="small" effect="plain" :type="item.tagType" :title="item.message">
+                        {{ item.message }}
+                      </el-tag>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="tool-action-row vasp-convert-actions">
+                <el-button
+                  type="primary"
+                  :icon="Switch"
+                  :loading="vaspState.converting"
+                  :disabled="!canConvertVaspDirectory"
+                  @click="convertVaspDirectory"
+                >
+                  转换
+                </el-button>
+                <el-button :disabled="!hasVaspDirectorySelection || vaspState.converting || vaspState.reading" @click="clearVaspDirectory">清空</el-button>
+              </div>
+            </section>
+
+            <el-dialog v-model="vaspState.struConfigDialogVisible" title="STRU 配置" width="760px" top="4vh" class="vasp-config-dialog" append-to-body>
+              <p class="vasp-dialog-intro">{{ vaspStruDialogIntro }}</p>
+              <StructureConverter
+                v-if="vaspState.poscarFile"
+                class="vasp-dialog-mapping-editor"
+                title="POSCAR 文件"
+                :show-source="false"
+                :show-actions="false"
+                mapping-description="如需使用其他赝势或轨道文件，可在下方修改；未调整时将使用默认配置。"
+                :state="poscarState"
+                :get-mapping-pp-options="getMappingPpOptions"
+                :get-mapping-basis-options="getMappingBasisOptions"
+                :format-path-option-label="formatPathOptionLabel"
+                :on-path-mode-change="handleMappingPathModeChange"
+                :on-pp-change="handleMappingPpChange"
+                :on-custom-pp-change="handleMappingCustomPpChange"
+                @remove-mapping="removeMapping(poscarState, $event)"
+              />
+              <template #footer>
+                <el-button type="primary" @click="vaspState.struConfigDialogVisible = false">完成配置</el-button>
+              </template>
+            </el-dialog>
+
+            <section v-if="hasVaspSourceFiles" class="vasp-output-workspace" aria-label="转换结果">
+              <el-tabs v-model="vaspState.resultTab" class="vasp-output-tabs">
+                <el-tab-pane v-if="vaspState.poscarFile" label="STRU" name="stru">
+                  <StructureOutput
+                    :show-title="false"
+                    :output="vaspState.struOutput"
+                    empty-text="完成配置后点击转换生成 STRU"
+                    @copy="copyText"
+                    @download="downloadText($event, 'STRU')"
+                  />
+                </el-tab-pane>
+
+                <el-tab-pane v-if="vaspState.incarFile" label="INPUT" name="input">
+                  <div v-if="vaspState.incarWarnings.length || vaspState.magmom !== null" class="vasp-input-notes">
+                    <div v-if="vaspState.magmom !== null" class="vasp-magmom">MAGMOM: <code>{{ formatVaspMagmom }}</code></div>
+                    <el-alert
+                      v-for="(warning, index) in vaspState.incarWarnings"
+                      :key="`${warning}-${index}`"
+                      :title="warning"
+                      type="warning"
+                      :closable="false"
+                      show-icon
+                    />
+                  </div>
+                  <StructureOutput
+                    :show-title="false"
+                    :output="vaspState.inputOutput"
+                    download-label="下载 INPUT"
+                    empty-text="完成配置后点击转换生成 INPUT"
+                    @copy="copyText"
+                    @download="downloadText($event, 'INPUT')"
+                  />
+                </el-tab-pane>
+
+                <el-tab-pane v-if="vaspState.kpointsFile" label="KPT" name="kpt">
+                  <StructureOutput
+                    :show-title="false"
+                    :output="vaspState.kptOutput"
+                    download-label="下载 KPT"
+                    empty-text="完成配置后点击转换生成 KPT"
+                    @copy="copyText"
+                    @download="downloadText($event, 'KPT')"
+                  />
+                </el-tab-pane>
+              </el-tabs>
+            </section>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="CIF → STRU" name="cif">
+          <div class="toolbox-grid">
+            <StructureConverter
+              title="CIF 文件"
+              accept=".cif"
+              path-placeholder="/root/.abacuslab/runs/.../structure.cif"
+              :state="cifState"
+              :get-mapping-pp-options="getMappingPpOptions"
+              :get-mapping-basis-options="getMappingBasisOptions"
+              :format-path-option-label="formatPathOptionLabel"
+              :on-path-mode-change="handleMappingPathModeChange"
+              :on-pp-change="handleMappingPpChange"
+              :on-custom-pp-change="handleMappingCustomPpChange"
+              @set-file="setFile($event, cifState, 'cif')"
+              @set-source-mode="setStructureSourceMode(cifState, $event)"
+              @set-host-path="setStructureHostPath(cifState, $event)"
+              @detect-path="prepareStructureMapping('cif', cifState)"
+              @remove-mapping="removeMapping(cifState, $event)"
+              @convert="convertStructure('cif')"
+              @clear="clearStructureState(cifState)"
+            />
+
+            <StructureOutput :output="cifState.output" @copy="copyText" @download="downloadText($event, 'STRU')" />
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="PYATB Input" name="pyatb">
+          <div class="toolbox-grid">
+            <section class="tool-panel pyatb-form-panel">
+              <div class="tool-panel-head">
+                <div>
+                  <h2 class="section-heading">输入参数</h2>
+                </div>
+              </div>
+
+              <el-form class="pyatb-form" label-width="150px">
+                <el-form-item label="输入来源">
+                  <el-radio-group
+                    v-model="pyatbState.sourceMode"
+                    class="pyatb-source-switch"
+                    @change="handlePyatbSourceModeChange"
+                  >
+                    <el-radio value="path">ABACUS 目录</el-radio>
+                    <el-radio value="task">ABACUS Task ID</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="pyatbState.sourceMode === 'path'" label="ABACUS 目录">
+                  <el-input v-model.trim="pyatbState.abacusPath" placeholder="/path/to/abacus/calculation" />
+                </el-form-item>
+                <el-form-item v-else label="ABACUS Task ID">
+                  <el-input v-model.trim="pyatbState.taskId" placeholder="task_xxxxxxxx" />
+                  <div class="field-tip">使用工作流任务中 type=abacus 的已完成任务 ID。</div>
+                </el-form-item>
+                <el-form-item label="计算属性">
+                  <el-checkbox-group v-model="pyatbState.properties">
+                    <el-checkbox v-for="property in pyatbProperties" :key="property" :label="property" :value="property" />
+                  </el-checkbox-group>
+                </el-form-item>
+                <section class="pyatb-options-panel">
+                  <div class="pyatb-options-head">
+                    <button type="button" class="pyatb-options-toggle" @click="togglePyatbOptions">
+                      <el-icon>
+                        <ArrowRight v-if="pyatbState.optionsCollapsed" />
+                        <ArrowDown v-else />
+                      </el-icon>
+                      <span>高级参数</span>
+                      <el-tag size="small" effect="plain">已填写 {{ pyatbOptionCount }} 项</el-tag>
+                    </button>
+                    <el-button text size="small" @click="clearPyatbOptions">清空高级参数</el-button>
+                  </div>
+                  <div v-show="!pyatbState.optionsCollapsed" class="pyatb-options-grid">
+                    <el-form-item
+                      v-for="option in pyatbAdvancedOptions"
+                      :key="option.key"
+                      :label="option.label"
+                      class="pyatb-option-item"
+                    >
+                      <el-select
+                        v-if="option.type === 'select'"
+                        v-model="pyatbState.options[option.key]"
+                        :placeholder="option.placeholder"
+                        clearable
+                      >
+                        <el-option
+                          v-for="item in option.options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        />
+                      </el-select>
+                      <el-input
+                        v-else
+                        v-model.trim="pyatbState.options[option.key]"
+                        :placeholder="option.placeholder"
+                      />
+                    </el-form-item>
+                  </div>
+                </section>
+              </el-form>
+
+              <div class="tool-action-row">
+                <el-button type="primary" :icon="DocumentAdd" :loading="pyatbState.loading" @click="generatePyatb">生成 Input</el-button>
+                <el-button @click="clearPyatb">清空</el-button>
+              </div>
+            </section>
+
+            <StructureOutput
+              title="生成结果"
+              :output="pyatbResultText"
+              download-label="下载 Input"
+              empty-text="暂无 PYATB Input 内容"
+              @copy="copyText"
+              @download="downloadText($event, 'Input')"
+            />
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane label="ABACUS INPUT" name="abacus-input">
+          <GenInputDialog
+            :key="abacusInputState.resetKey"
+            mode="inline"
+            title="ABACUS INPUT 参数配置"
+            :initial-value="abacusInputState.content"
+            @update:content="abacusInputState.content = $event"
+          >
+            <template #preview-actions>
+              <el-button type="primary" size="small" :icon="DocumentAdd" @click="downloadText(abacusInputState.content, 'INPUT')">下载 INPUT</el-button>
+              <el-button size="small" @click="copyText(abacusInputState.content)">复制</el-button>
+              <el-button size="small" @click="clearAbacusInput">清空</el-button>
+            </template>
+          </GenInputDialog>
+        </el-tab-pane>
+      </el-tabs>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { computed, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ArrowDown, ArrowRight, Document, DocumentAdd, FolderOpened, Search, Switch } from '@element-plus/icons-vue'
+
+import {
+  convertCifToStru,
+  convertIncarToInput,
+  convertKpointsToKpt,
+  convertPoscarToStru,
+  detectCifElements,
+  detectPoscarElements,
+  generatePyatbInput,
+  getDefaultMasses,
+  getDefaultPpPaths,
+} from '@/api/tools'
+import { readServerFile } from '@/api/files'
+import { collectPyatbOptions, createDefaultPyatbOptions, pyatbAdvancedOptions, pyatbProperties } from '@/config/pyatb'
+import { copyTextToClipboard } from '@/utils/clipboard'
+import { formatJson } from '@/utils/format'
+import { buildDefaultPpPathMap } from '@/utils/ppPathMap'
+import GenInputDialog from '@/views/templates/components/gen_input.vue'
+import StructureConverter from './components/StructureConverter.vue'
+import StructureOutput from './components/StructureOutput.vue'
+
+const maxUploadSize = 20 * 1024 * 1024
+const activeTool = ref('vasp')
+const cifState = reactive(createStructureState())
+const poscarState = reactive(createStructureState())
+const vaspState = reactive(createVaspDirectoryState())
+const vaspIncarStructureInput = ref(null)
+const defaultMasses = ref(null)
+const defaultPpPathMap = ref(null)
+const toolHints = {
+  cif: {
+    title: 'CIF 转 STRU',
+    description: '将 CIF 格式结构文件转换为 ABACUS 可用的 STRU 文件。',
+  },
+  poscar: {
+    title: 'POSCAR 转 STRU',
+    description: '将 VASP POSCAR 或 CONTCAR 结构文件转换为 ABACUS STRU 文件。',
+  },
+  vasp: {
+    title: 'VASP 文件转 ABACUS文件',
+    description: '读取 VASP 计算目录中的 POSCAR、INCAR、KPOINTS，完成配置后生成 ABACUS STRU、INPUT 和 KPT 文件。',
+  },
+  pyatb: {
+    title: 'PYATB Input 生成',
+    description: '根据 ABACUS 计算目录或已完成 ABACUS 任务 ID 生成 PYATB Input 配置。',
+  },
+  'abacus-input': {
+    title: 'ABACUS INPUT 配置',
+    description: '直接配置并预览 ABACUS INPUT 文件内容，可复制或下载为 INPUT。',
+  },
+}
+const abacusInputState = reactive({
+  content: '',
+  resetKey: 0,
+})
+const pyatbState = reactive({
+  sourceMode: 'path',
+  abacusPath: '',
+  taskId: '',
+  properties: ['BAND_STRUCTURE'],
+  options: createDefaultPyatbOptions(),
+  optionsCollapsed: true,
+  result: null,
+  loading: false,
+})
+
+const pyatbResultText = computed(() => {
+  if (!pyatbState.result) {
+    return ''
+  }
+
+  return pyatbState.result.input_content || formatJson(pyatbState.result)
+})
+
+const pyatbOptionCount = computed(() => Object.keys(collectPyatbOptions(pyatbState.options)).length)
+const activeToolHint = computed(() => toolHints[activeTool.value] || toolHints.cif)
+const hasVaspDirectorySelection = computed(() => Boolean(vaspState.directoryName))
+const hasVaspSourceFiles = computed(() => Boolean(
+  vaspState.poscarFile || vaspState.incarFile || vaspState.kpointsFile,
+))
+const canConvertVaspDirectory = computed(() => (
+  hasVaspSourceFiles.value &&
+  !vaspState.converting &&
+  !vaspState.reading &&
+  (!vaspState.poscarFile || poscarState.mappings.length > 0)
+))
+const vaspStruDialogIntro = computed(() => {
+  const elements = poscarState.mappings.map((mapping) => mapping.element).filter(Boolean)
+
+  if (!elements.length) {
+    return '元素映射尚未准备完成，请检查下方配置后再转换。'
+  }
+
+  return ``
+})
+const vaspIncarStructureInfo = computed(() => {
+  if (vaspState.incarStructureSource === 'custom' && vaspState.incarStructureFile) {
+    return {
+      title: vaspState.incarStructureFile.name,
+      subtitle: '已选择文件，点击右侧按钮可更换。',
+    }
+  }
+
+  return {
+    title: '选择结构文件',
+    subtitle: '点击右侧按钮选择，之后也可以更换。',
+  }
+})
+const vaspIncarStructureActionLabel = computed(() => (
+  vaspState.incarStructureSource === 'custom' && vaspState.incarStructureFile
+    ? '更换文件'
+    : '选择结构文件'
+))
+const formatVaspMagmom = computed(() => {
+  if (vaspState.magmom === null) {
+    return ''
+  }
+
+  try {
+    return JSON.stringify(vaspState.magmom)
+  } catch {
+    return String(vaspState.magmom)
+  }
+})
+const vaspFileStatuses = computed(() => [
+  getVaspFileStatus('poscar', 'POSCAR', 'STRU', vaspState.poscarFile),
+  getVaspFileStatus('incar', 'INCAR', 'INPUT', vaspState.incarFile),
+  getVaspFileStatus('kpoints', 'KPOINTS', 'KPT', vaspState.kpointsFile),
+].filter((item) => item.file))
+
+function createStructureState() {
+  return {
+    inputKey: 0,
+    sourceMode: 'file',
+    file: null,
+    hostPath: '',
+    mappings: [],
+    output: '',
+    detecting: false,
+    converting: false,
+  }
+}
+
+function createVaspDirectoryState() {
+  return {
+    inputKey: 0,
+    sourceMode: 'local',
+    hostPath: '',
+    directoryName: '',
+    poscarFile: null,
+    incarFile: null,
+    kpointsFile: null,
+    incarStructureFile: null,
+    incarStructureInputKey: 0,
+    incarStructureSource: '',
+    struConfigDialogVisible: false,
+    struOutput: '',
+    inputOutput: '',
+    kptOutput: '',
+    incarWarnings: [],
+    magmom: null,
+    reading: false,
+    converting: false,
+    resultTab: 'stru',
+    status: {
+      poscar: 'idle',
+      incar: 'idle',
+      kpoints: 'idle',
+    },
+    errors: {
+      poscar: '',
+      incar: '',
+      kpoints: '',
+    },
+  }
+}
+
+function normalizeElement(value) {
+  const text = String(value || '').trim()
+
+  if (!text) {
+    return ''
+  }
+
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+
+async function setFile(file, state, type) {
+  if (!file) {
+    state.file = null
+    state.output = ''
+    state.mappings = []
+    return
+  }
+
+  if (file.size > maxUploadSize) {
+    ElMessage.warning('文件超过 20MB，请确认是否选择了正确的结构文件')
+    return
+  }
+
+  state.file = file
+  state.sourceMode = 'file'
+  state.hostPath = ''
+  state.output = ''
+  state.mappings = []
+
+  await prepareStructureMapping(type, state)
+}
+
+function setStructureSourceMode(state, mode) {
+  if (!['file', 'path'].includes(mode) || state.sourceMode === mode) {
+    return
+  }
+
+  state.sourceMode = mode
+  state.output = ''
+  state.mappings = []
+
+  if (mode === 'path') {
+    state.file = null
+    state.inputKey += 1
+  } else {
+    state.hostPath = ''
+  }
+}
+
+function setStructureHostPath(state, path) {
+  const nextPath = String(path || '')
+
+  if (state.hostPath === nextPath) {
+    return
+  }
+
+  state.sourceMode = 'path'
+  state.hostPath = nextPath
+  state.output = ''
+  state.mappings = []
+}
+
+function createMapping(element = '') {
+  const normalized = normalizeElement(element)
+
+  return {
+    element: normalized,
+    pp: '',
+    ppChoice: '',
+    basis: '',
+    pathMode: 'preset',
+    pathCandidates: [],
+    ppOptions: [],
+    basisOptions: [],
+    mass: '',
+    magmom: '',
+  }
+}
+
+function removeMapping(state, index) {
+  state.mappings.splice(index, 1)
+}
+
+async function detectElements(type, { silent = false } = {}) {
+  const state = type === 'cif' ? cifState : poscarState
+  const detector = type === 'cif' ? detectCifElements : detectPoscarElements
+  const source = getStructureSource(state)
+
+  if (!source) {
+    if (!silent) {
+      ElMessage.warning(state.sourceMode === 'path' ? '请先填写宿主机文件路径' : '请先选择文件')
+    }
+    return
+  }
+
+  try {
+    state.detecting = true
+    const result = await detector(source)
+
+    if (result?.error) {
+      ElMessage.warning(result.error)
+    }
+
+    const elements = Array.isArray(result?.elements) ? result.elements : []
+    state.mappings = elements.map((element) => createMapping(element))
+
+    if (elements.length) {
+      try {
+        await loadMappingPpPathOptions(state.mappings)
+      } catch (error) {
+        ElMessage.warning('已检测到元素，但默认路径加载失败，请手动填写 PP/Orb 路径')
+      }
+    }
+
+    if (!silent) {
+      ElMessage.success(elements.length ? `检测到 ${elements.length} 个元素，已填充默认 PP/Orb 路径` : '未检测到元素')
+    }
+    return
+  } finally {
+    state.detecting = false
+  }
+}
+
+async function fillDefaultMasses(state, { silent = false } = {}) {
+  if (!state.mappings.length) {
+    if (!silent) {
+      ElMessage.warning('请先检测元素')
+    }
+    return
+  }
+
+  if (!defaultMasses.value) {
+    defaultMasses.value = await getDefaultMasses()
+  }
+
+  state.mappings.forEach((mapping) => {
+    const element = normalizeElement(mapping.element)
+    const mass = defaultMasses.value?.[element]
+
+    if (mass !== undefined && mapping.mass === '') {
+      mapping.mass = String(mass)
+    }
+  })
+
+  if (!silent) {
+    ElMessage.success('已填充默认质量')
+  }
+}
+
+async function fillDefaultPpPaths(state, { silent = false } = {}) {
+  if (!state.mappings.length) {
+    if (!silent) {
+      ElMessage.warning('请先检测元素')
+    }
+    return
+  }
+
+  const ppPathMap = await loadDefaultPpPathMap()
+  let filledCount = 0
+  let matchedCount = 0
+
+  state.mappings.forEach((mapping) => {
+    const element = normalizeElement(mapping.element)
+    const paths = ppPathMap[element]
+
+    if (!paths) {
+      return
+    }
+
+    matchedCount += 1
+    const previousPp = String(mapping.pp || '')
+    const previousBasis = String(mapping.basis || '')
+
+    applyMappingPathCandidates(mapping, paths.candidates, { preferDefault: true })
+
+    if (mapping.pp && mapping.pp !== previousPp) {
+      filledCount += 1
+    }
+
+    if (mapping.basis && mapping.basis !== previousBasis) {
+      filledCount += 1
+    }
+  })
+
+  if (!silent) {
+    ElMessage.success(
+      filledCount
+        ? '已填充默认赝势/轨道路径'
+        : matchedCount
+          ? '当前已是默认赝势/轨道路径'
+          : '未找到可填充的默认路径',
+    )
+  }
+}
+
+async function loadMappingPpPathOptions(mappings, { preserveExisting = true } = {}) {
+  const ppPathMap = await loadDefaultPpPathMap()
+  let optionCount = 0
+
+  mappings.forEach((mapping) => {
+    const element = normalizeElement(mapping.element)
+    const paths = ppPathMap[element]
+
+    if (!paths) {
+      return
+    }
+
+    applyMappingPathCandidates(mapping, paths.candidates, { preserveExisting })
+
+    optionCount += paths.candidates.reduce((count, candidate) => (
+      count + candidate.ppFiles.length + candidate.orbitalFiles.length
+    ), 0)
+  })
+
+  return optionCount
+}
+
+async function loadDefaultPpPathMap() {
+  if (defaultPpPathMap.value && Object.keys(defaultPpPathMap.value).length) {
+    return defaultPpPathMap.value
+  }
+
+  defaultPpPathMap.value = buildDefaultPpPathMap(await getDefaultPpPaths(), normalizeElement)
+
+  return defaultPpPathMap.value
+}
+
+function uniquePaths(paths) {
+  return [...new Set(paths.map((path) => String(path || '').trim()).filter(Boolean))]
+}
+
+function getMappingPpOptions(mapping) {
+  const candidates = getMappingPathCandidates(mapping)
+
+  if (candidates.length) {
+    return candidates.map((candidate) => ({
+      value: candidate.id,
+      label: formatCandidateOptionLabel(candidate),
+    }))
+  }
+
+  return uniquePaths([mapping.pp, ...(Array.isArray(mapping.ppOptions) ? mapping.ppOptions : [])])
+    .map((path) => ({
+      value: path,
+      label: formatPathOptionLabel(path),
+    }))
+}
+
+function getMappingBasisOptions(mapping) {
+  return uniquePaths([
+    mapping.basis,
+    ...getMatchingOrbitalFiles(mapping),
+  ])
+}
+
+function formatPathOptionLabel(path) {
+  const parts = String(path || '').replaceAll('\\', '/').split('/').filter(Boolean)
+  return parts.slice(-4).join('/') || String(path || '')
+}
+
+function applyMappingPathCandidates(mapping, candidates, { preserveExisting = false, preferDefault = false } = {}) {
+  mapping.pathCandidates = Array.isArray(candidates) ? candidates : []
+  mapping.ppOptions = getMappingPathCandidates(mapping).flatMap((candidate) => candidate.ppFiles)
+
+  const pathCandidates = getMappingPathCandidates(mapping)
+  const selectedCandidate = preferDefault ? pathCandidates[0] : findCandidateForMapping(mapping) || pathCandidates[0]
+
+  if (preferDefault || !preserveExisting || !String(mapping.ppChoice || '').trim() || !findCandidateById(mapping, mapping.ppChoice)) {
+    mapping.ppChoice = selectedCandidate?.id || ''
+    mapping.pp = selectedCandidate?.ppFiles?.[0] || ''
+    mapping.pathMode = 'preset'
+  }
+
+  updateMappingOrbitalOptions(mapping, { preserveExisting: preserveExisting && !preferDefault })
+}
+
+async function prepareStructureMapping(type, state) {
+  const source = getStructureSource(state)
+
+  if (!source) {
+    ElMessage.warning(state.sourceMode === 'path' ? '请先填写宿主机文件路径' : '请先选择文件')
+    return
+  }
+
+  await detectElements(type, { silent: true })
+
+  if (!state.mappings.length) {
+    ElMessage.warning('未检测到元素')
+    return
+  }
+
+  await fillDefaultMasses(state, { silent: true })
+  await fillDefaultPpPaths(state, { silent: true })
+  ElMessage.success(`检测到 ${state.mappings.length} 个元素，已自动填充默认映射`)
+}
+
+function handleMappingPpChange(mapping, value) {
+  mapping.ppChoice = value
+  const selectedCandidate = findCandidateById(mapping, value)
+
+  if (selectedCandidate) {
+    mapping.pp = selectedCandidate.ppFiles[0] || ''
+    mapping.pathMode = 'preset'
+  } else {
+    mapping.pp = value
+    mapping.pathMode = 'custom'
+  }
+
+  updateMappingOrbitalOptions(mapping)
+}
+
+function handleMappingPathModeChange(mapping, mode) {
+  mapping.pathMode = mode
+
+  if (mode === 'preset') {
+    const selectedCandidate = findCandidateById(mapping, mapping.ppChoice) || getMappingPathCandidates(mapping)[0]
+
+    if (selectedCandidate) {
+      mapping.ppChoice = selectedCandidate.id
+      mapping.pp = selectedCandidate.ppFiles[0] || ''
+      updateMappingOrbitalOptions(mapping)
+    }
+  }
+}
+
+function handleMappingCustomPpChange(mapping) {
+  mapping.ppChoice = ''
+  mapping.pathMode = 'custom'
+}
+
+function updateMappingOrbitalOptions(mapping, { preserveExisting = false } = {}) {
+  const orbitalFiles = getMatchingOrbitalFiles(mapping)
+  mapping.basisOptions = orbitalFiles
+
+  if (preserveExisting && orbitalFiles.includes(mapping.basis)) {
+    return
+  }
+
+  mapping.basis = orbitalFiles[0] || ''
+}
+
+function getMatchingOrbitalFiles(mapping) {
+  const candidates = getMappingPathCandidates(mapping)
+  const selectedCandidate = findCandidateById(mapping, mapping.ppChoice)
+
+  if (selectedCandidate) {
+    return uniquePaths(selectedCandidate.orbitalFiles)
+  }
+
+  const pp = String(mapping.pp || '').trim()
+
+  if (!pp) {
+    return uniquePaths(candidates.flatMap((candidate) => candidate.orbitalFiles))
+  }
+
+  const matchedCandidates = candidates.filter((candidate) => candidate.ppFiles.includes(pp))
+  return uniquePaths(matchedCandidates.flatMap((candidate) => candidate.orbitalFiles))
+}
+
+function getMappingPathCandidates(mapping) {
+  return Array.isArray(mapping.pathCandidates) ? mapping.pathCandidates : []
+}
+
+function findCandidateById(mapping, id) {
+  return getMappingPathCandidates(mapping).find((candidate) => candidate.id === id)
+}
+
+function findCandidateForMapping(mapping) {
+  const pp = String(mapping.pp || '').trim()
+  const basis = String(mapping.basis || '').trim()
+
+  return getMappingPathCandidates(mapping).find((candidate) => (
+    (!pp || candidate.ppFiles.includes(pp)) &&
+    (!basis || candidate.orbitalFiles.includes(basis))
+  ))
+}
+
+function formatCandidateOptionLabel(candidate) {
+  const ppSet = candidate.ppSet || 'PP'
+  const orbitalSet = candidate.orbitalSet || 'Orb'
+  const ppName = formatPathOptionLabel(candidate.ppFiles[0] || '')
+  return `${ppSet} -> ${orbitalSet} · ${ppName}`
+}
+
+function parseOptionalNumber(value, label) {
+  const text = String(value ?? '').trim()
+
+  if (!text) {
+    return undefined
+  }
+
+  const parsed = Number(text)
+
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`${label} 必须是数字`)
+  }
+
+  return parsed
+}
+
+function normalizeHostFilePath(path) {
+  return String(path || '').trim().replaceAll('\\', '/').replace(/\/+$/, '')
+}
+
+function getStructureSource(state) {
+  if (state.sourceMode === 'path') {
+    const path = normalizeHostFilePath(state.hostPath)
+    return path ? { content: '', path } : null
+  }
+
+  return state.file || null
+}
+
+function getStructureSourceLabel(state) {
+  if (state.sourceMode === 'path') {
+    return '宿主机文件路径'
+  }
+
+  return '文件'
+}
+
+function getFileNameFromPath(path, fallback) {
+  const fileName = normalizeHostFilePath(path).split('/').filter(Boolean).pop()
+  return fileName || fallback
+}
+
+async function getStructureUploadFile(state, type) {
+  if (state.sourceMode !== 'path') {
+    return state.file
+  }
+
+  const path = normalizeHostFilePath(state.hostPath)
+
+  if (!path) {
+    throw new Error('请先填写宿主机文件路径')
+  }
+
+  const file = await readServerFile(path)
+  const content = file?.content
+
+  if (typeof content !== 'string') {
+    throw new Error('宿主机文件读取失败，未返回文本内容')
+  }
+
+  return new File([content], getFileNameFromPath(file?.path || path, type === 'cif' ? 'structure.cif' : 'POSCAR'), {
+    type: 'text/plain;charset=utf-8',
+  })
+}
+
+async function buildStructureFormData(state, type) {
+  if (!getStructureSource(state)) {
+    throw new Error(`请先选择${getStructureSourceLabel(state)}`)
+  }
+
+  if (!state.mappings.length) {
+    throw new Error('请配置元素映射')
+  }
+
+  const sourceFile = await getStructureUploadFile(state, type)
+
+  const pp = {}
+  const basis = {}
+  const masses = {}
+  const magmom = {}
+  const elements = []
+  const seenElements = new Set()
+
+  // 后端结构转换接口要求映射字段以 JSON 字符串放在 multipart 表单里。
+  state.mappings.forEach((mapping) => {
+    const element = normalizeElement(mapping.element)
+
+    if (!element) {
+      throw new Error('元素符号不能为空')
+    }
+
+    if (seenElements.has(element)) {
+      throw new Error(`元素 ${element} 配置重复`)
+    }
+
+    seenElements.add(element)
+    elements.push(element)
+
+    const ppFile = String(mapping.pp || '').trim()
+    const basisFile = String(mapping.basis || '').trim()
+
+    if (!ppFile || !basisFile) {
+      const missingPaths = [!ppFile ? 'PP' : '', !basisFile ? 'Orb' : ''].filter(Boolean).join(' 和 ')
+      throw new Error(`元素 ${element} 请先选择或填写 ${missingPaths} 路径`)
+    }
+
+    pp[element] = ppFile
+    basis[element] = basisFile
+
+    const mass = parseOptionalNumber(mapping.mass, `${element} 质量`)
+    const magneticMoment = parseOptionalNumber(mapping.magmom, `${element} 磁矩`)
+
+    if (mass !== undefined) {
+      masses[element] = mass
+    }
+
+    if (magneticMoment !== undefined) {
+      magmom[element] = magneticMoment
+    }
+  })
+
+  const formData = new FormData()
+  formData.append('file', sourceFile)
+  formData.append('elements', JSON.stringify(elements))
+  formData.append('pp', JSON.stringify(pp))
+  formData.append('basis', JSON.stringify(basis))
+
+  if (Object.keys(masses).length) {
+    formData.append('masses', JSON.stringify(masses))
+  }
+
+  if (Object.keys(magmom).length) {
+    formData.append('magmom', JSON.stringify(magmom))
+  }
+
+  return formData
+}
+
+async function convertStructure(type) {
+  const state = type === 'cif' ? cifState : poscarState
+  const converter = type === 'cif' ? convertCifToStru : convertPoscarToStru
+
+  try {
+    state.converting = true
+    state.output = await converter(await buildStructureFormData(state, type))
+    ElMessage.success('转换完成')
+  } catch (error) {
+    if (error?.message && !error?.response) {
+      ElMessage.warning(error.message)
+    }
+  } finally {
+    state.converting = false
+  }
+}
+
+function clearStructureState(state) {
+  state.inputKey += 1
+  state.sourceMode = 'file'
+  state.file = null
+  state.hostPath = ''
+  state.mappings = []
+  state.output = ''
+}
+
+async function setVaspDirectory(event) {
+  const files = Array.from(event.target.files || [])
+
+  resetVaspDirectoryState({ sourceMode: 'local' })
+  clearStructureState(poscarState)
+
+  if (!files.length) {
+    return
+  }
+
+  vaspState.directoryName = getVaspDirectoryName(files)
+  vaspState.poscarFile = findVaspDirectoryFile(files, 'POSCAR')
+  vaspState.incarFile = findVaspDirectoryFile(files, 'INCAR')
+  vaspState.kpointsFile = findVaspDirectoryFile(files, 'KPOINTS')
+  clearVaspIncarStructureSelection()
+  selectFirstVaspResultTab()
+
+  if (!vaspState.poscarFile && !vaspState.incarFile && !vaspState.kpointsFile) {
+    ElMessage.warning('所选目录中未找到 POSCAR、INCAR 或 KPOINTS 文件')
+    return
+  }
+
+  await prepareVaspPoscarConfiguration()
+}
+
+function setVaspSourceMode(mode) {
+  if (!['local', 'path'].includes(mode)) {
+    return
+  }
+
+  resetVaspDirectoryState({ sourceMode: mode })
+  clearStructureState(poscarState)
+}
+
+function setVaspHostPath(path) {
+  const nextPath = String(path || '')
+
+  if (vaspState.hostPath === nextPath) {
+    return
+  }
+
+  resetVaspDirectoryState({
+    sourceMode: 'path',
+    hostPath: nextPath,
+  })
+  clearStructureState(poscarState)
+}
+
+async function readVaspHostDirectory() {
+  const directoryPath = normalizeHostDirectoryPath(vaspState.hostPath)
+
+  if (!directoryPath) {
+    ElMessage.warning('请先填写宿主机 VASP 计算目录')
+    return
+  }
+
+  resetVaspDirectoryState({
+    sourceMode: 'path',
+    hostPath: directoryPath,
+    directoryName: directoryPath,
+  })
+  clearStructureState(poscarState)
+
+  try {
+    vaspState.reading = true
+    const files = await Promise.all([
+      readVaspHostFile(directoryPath, 'POSCAR'),
+      readVaspHostFile(directoryPath, 'INCAR'),
+      readVaspHostFile(directoryPath, 'KPOINTS'),
+    ])
+
+    vaspState.poscarFile = files[0]
+    vaspState.incarFile = files[1]
+    vaspState.kpointsFile = files[2]
+    clearVaspIncarStructureSelection()
+    selectFirstVaspResultTab()
+
+    if (!hasVaspSourceFiles.value) {
+      ElMessage.warning('该目录中未找到 POSCAR、INCAR 或 KPOINTS 文件')
+      return
+    }
+
+    await prepareVaspPoscarConfiguration()
+  } finally {
+    vaspState.reading = false
+  }
+}
+
+async function readVaspHostFile(directoryPath, filename) {
+  try {
+    const file = await readServerFile(joinHostDirectoryPath(directoryPath, filename), { silent: true })
+    const content = file?.content
+
+    if (typeof content !== 'string') {
+      return null
+    }
+
+    return new File([content], filename, { type: 'text/plain;charset=utf-8' })
+  } catch {
+    return null
+  }
+}
+
+function normalizeHostDirectoryPath(path) {
+  return String(path || '').trim().replaceAll('\\', '/').replace(/\/+$/, '')
+}
+
+function joinHostDirectoryPath(directoryPath, filename) {
+  return `${normalizeHostDirectoryPath(directoryPath)}/${filename}`
+}
+
+function selectFirstVaspResultTab() {
+  if (vaspState.poscarFile) {
+    vaspState.resultTab = 'stru'
+    return
+  }
+
+  if (vaspState.incarFile) {
+    vaspState.resultTab = 'input'
+    return
+  }
+
+  if (vaspState.kpointsFile) {
+    vaspState.resultTab = 'kpt'
+  }
+}
+
+function openVaspFileConfig(key) {
+  if (key === 'poscar' && vaspState.poscarFile) {
+    vaspState.struConfigDialogVisible = true
+  }
+}
+
+async function prepareVaspPoscarConfiguration() {
+  if (!vaspState.poscarFile) {
+    return
+  }
+
+  clearStructureState(poscarState)
+  poscarState.file = vaspState.poscarFile
+  poscarState.sourceMode = 'file'
+
+  try {
+    await prepareStructureMapping('poscar', poscarState)
+  } catch {
+    ElMessage.warning('POSCAR 元素映射读取失败，请重新读取目录后再试')
+  }
+}
+
+function setVaspIncarStructureFile(event) {
+  const file = event.target.files?.[0] || null
+
+  if (!file) {
+    return
+  }
+
+  vaspState.incarStructureFile = file
+  vaspState.incarStructureSource = 'custom'
+  vaspState.incarStructureInputKey += 1
+  resetVaspIncarOutput()
+}
+
+function selectVaspIncarStructureFile() {
+  vaspIncarStructureInput.value?.click()
+}
+
+function clearVaspIncarStructureSelection() {
+  vaspState.incarStructureFile = null
+  vaspState.incarStructureSource = ''
+  vaspState.incarStructureInputKey += 1
+  resetVaspIncarOutput()
+}
+
+function resetVaspIncarOutput() {
+  vaspState.inputOutput = ''
+  vaspState.incarWarnings = []
+  vaspState.magmom = null
+
+  if (vaspState.incarFile) {
+    vaspState.status.incar = 'idle'
+    vaspState.errors.incar = ''
+  }
+}
+
+function getVaspDirectoryName(files) {
+  const relativePath = String(files.find((file) => file?.webkitRelativePath)?.webkitRelativePath || '')
+  const [directoryName] = relativePath.split('/').filter(Boolean)
+
+  return directoryName || '已选择目录'
+}
+
+function findVaspDirectoryFile(files, expectedName) {
+  const normalizedExpectedName = expectedName.toUpperCase()
+
+  return files.find((file) => String(file?.name || '').trim().toUpperCase() === normalizedExpectedName) || null
+}
+
+async function convertVaspDirectory() {
+  if (!hasVaspSourceFiles.value) {
+    ElMessage.warning('请先读取包含 POSCAR、INCAR 或 KPOINTS 的 VASP 计算目录')
+    return
+  }
+
+  const conversions = [
+    ['poscar', vaspState.poscarFile, convertVaspPoscar],
+    ['incar', vaspState.incarFile, convertVaspIncar],
+    ['kpoints', vaspState.kpointsFile, convertVaspKpoints],
+  ]
+
+  vaspState.converting = true
+  vaspState.struOutput = ''
+  vaspState.inputOutput = ''
+  vaspState.kptOutput = ''
+  vaspState.incarWarnings = []
+  vaspState.magmom = null
+
+  conversions.forEach(([key, file]) => {
+    vaspState.status[key] = file ? 'converting' : 'missing'
+    vaspState.errors[key] = ''
+  })
+
+  try {
+    await Promise.all(conversions
+      .filter(([, file]) => file)
+      .map(([, , converter]) => converter()))
+
+    const completedCount = Object.values(vaspState.status).filter((status) => status === 'success').length
+    if (completedCount) {
+      ElMessage.success(`已生成 ${completedCount} 个 ABACUS 输入文件`)
+    }
+  } finally {
+    vaspState.converting = false
+  }
+}
+
+async function convertVaspPoscar() {
+  if (!vaspState.poscarFile) {
+    return
+  }
+
+  try {
+    if (!poscarState.mappings.length) {
+      throw new Error('请先完成 POSCAR 的元素映射配置')
+    }
+
+    vaspState.struOutput = await convertPoscarToStru(await buildStructureFormData(poscarState, 'poscar'))
+    vaspState.status.poscar = 'success'
+  } catch (error) {
+    vaspState.status.poscar = 'error'
+    vaspState.errors.poscar = getVaspConversionError(error)
+  }
+}
+
+async function convertVaspIncar() {
+  if (!vaspState.incarFile) {
+    return
+  }
+
+  try {
+    const formData = new FormData()
+    formData.append('incar', vaspState.incarFile)
+
+    if (vaspState.incarStructureSource === 'custom' && vaspState.incarStructureFile) {
+      formData.append('stru', vaspState.incarStructureFile)
+    }
+
+    const result = await convertIncarToInput(formData)
+    vaspState.inputOutput = typeof result === 'string' ? result : String(result?.input || '')
+    vaspState.incarWarnings = Array.isArray(result?.warnings) ? result.warnings : []
+    vaspState.magmom = result?.magmom ?? null
+
+    if (!vaspState.inputOutput.trim()) {
+      throw new Error('INCAR 转换接口未返回 INPUT 内容')
+    }
+
+    vaspState.status.incar = 'success'
+  } catch (error) {
+    vaspState.status.incar = 'error'
+    vaspState.errors.incar = getVaspConversionError(error)
+  }
+}
+
+async function convertVaspKpoints() {
+  if (!vaspState.kpointsFile) {
+    return
+  }
+
+  try {
+    const formData = new FormData()
+    formData.append('file', vaspState.kpointsFile)
+
+    const result = await convertKpointsToKpt(formData)
+    vaspState.kptOutput = typeof result === 'string' ? result : String(result?.kpt || '')
+
+    if (!vaspState.kptOutput.trim()) {
+      throw new Error('KPOINTS 转换接口未返回 KPT 内容')
+    }
+
+    vaspState.status.kpoints = 'success'
+  } catch (error) {
+    vaspState.status.kpoints = 'error'
+    vaspState.errors.kpoints = getVaspConversionError(error)
+  }
+}
+
+function getVaspConversionError(error) {
+  const responseData = error?.response?.data
+  const message = typeof responseData === 'string'
+    ? responseData
+    : responseData?.error || responseData?.message || error?.message
+
+  return String(message || '转换失败，请检查源文件内容').trim()
+}
+
+function getVaspFileStatus(key, source, target, file) {
+  const status = vaspState.status[key]
+  const error = vaspState.errors[key]
+  const configAction = getVaspFileConfigAction(key)
+
+  if (!file) {
+    return { key, source, target, file, description: '', status, tagType: 'info', message: '缺少文件', configAction }
+  }
+
+  if (status === 'converting') {
+    return { key, source, target, file, description: getVaspFileDescription(key), status, tagType: 'warning', message: '转换中', configAction }
+  }
+
+  if (status === 'success') {
+    return { key, source, target, file, description: getVaspFileDescription(key), status, tagType: 'success', message: '已生成', configAction }
+  }
+
+  if (status === 'error') {
+    return { key, source, target, file, description: getVaspFileDescription(key), status, tagType: 'danger', message: error || '转换失败', configAction }
+  }
+
+  return { key, source, target, file, description: getVaspFileDescription(key), status, tagType: 'info', message: '等待转换', configAction }
+}
+
+function getVaspFileConfigAction(key) {
+  const actions = {
+    poscar: '配置 STRU',
+  }
+
+  return actions[key] || ''
+}
+
+function getVaspFileDescription(key) {
+  const descriptions = {
+    poscar: '结构信息',
+    incar: '计算参数',
+    kpoints: 'K 点设置',
+  }
+
+  return descriptions[key] || ''
+}
+
+function resetVaspDirectoryState(overrides = {}) {
+  const inputKey = vaspState.inputKey
+  Object.assign(vaspState, createVaspDirectoryState(), overrides)
+  vaspState.inputKey = inputKey
+}
+
+function clearVaspDirectory() {
+  const nextInputKey = vaspState.inputKey + 1
+  Object.assign(vaspState, createVaspDirectoryState())
+  vaspState.inputKey = nextInputKey
+  clearStructureState(poscarState)
+}
+
+async function generatePyatb() {
+  if (!pyatbState.properties.length) {
+    ElMessage.warning('请至少选择一个计算属性')
+    return
+  }
+
+  if (pyatbState.sourceMode === 'path' && !pyatbState.abacusPath) {
+    ElMessage.warning('请填写 ABACUS 目录')
+    return
+  }
+
+  if (pyatbState.sourceMode === 'task' && !pyatbState.taskId) {
+    ElMessage.warning('请填写 ABACUS Task ID')
+    return
+  }
+
+  try {
+    pyatbState.loading = true
+    const options = collectPyatbOptions(pyatbState.options)
+    const sourcePayload = pyatbState.sourceMode === 'path'
+      ? { abacus_path: pyatbState.abacusPath }
+      : { abacus_task_id: pyatbState.taskId }
+
+    pyatbState.result = await generatePyatbInput({
+      ...sourcePayload,
+      properties: pyatbState.properties,
+      options: Object.keys(options).length ? options : undefined,
+    })
+    ElMessage.success('PYATB Input 已生成')
+  } finally {
+    pyatbState.loading = false
+  }
+}
+
+function clearPyatb() {
+  pyatbState.sourceMode = 'path'
+  pyatbState.abacusPath = ''
+  pyatbState.taskId = ''
+  pyatbState.properties = ['BAND_STRUCTURE']
+  clearPyatbOptions()
+  pyatbState.optionsCollapsed = true
+  pyatbState.result = null
+}
+
+function clearPyatbOptions() {
+  Object.assign(pyatbState.options, createDefaultPyatbOptions())
+}
+
+function togglePyatbOptions() {
+  pyatbState.optionsCollapsed = !pyatbState.optionsCollapsed
+}
+
+function handlePyatbSourceModeChange(mode) {
+  if (mode === 'path') {
+    pyatbState.taskId = ''
+    return
+  }
+
+  pyatbState.abacusPath = ''
+}
+
+function clearAbacusInput() {
+  abacusInputState.content = ''
+  abacusInputState.resetKey += 1
+}
+
+async function copyText(text) {
+  try {
+    await copyTextToClipboard(text)
+    ElMessage.success('已复制')
+  } catch {
+    ElMessage.error('复制失败，请手动选择内容复制')
+  }
+}
+
+function downloadText(text, filename) {
+  const blob = new Blob([text], {
+    type: 'text/plain;charset=utf-8',
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+</script>
+
+<style scoped>
+.toolbox-page {
+  min-width: 0;
+}
+
+.toolbox-shell {
+  min-width: 0;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+}
+
+.toolbox-tabs :deep(.el-tabs__header) {
+  margin-bottom: 14px;
+}
+
+.toolbox-tabs :deep(.el-tabs__nav-wrap::after) {
+  height: 1px;
+  background: var(--app-border-soft);
+}
+
+.toolbox-tabs :deep(.el-tabs__item) {
+  height: 38px;
+  padding: 0 18px;
+  font-weight: 800;
+}
+
+.toolbox-tab-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  min-width: 0;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-primary-soft);
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+}
+
+.toolbox-tab-hint strong {
+  color: var(--app-primary-strong);
+  font-size: var(--app-font-size);
+}
+
+.toolbox-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.vasp-toolbox-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 850px);
+  gap: 14px;
+  align-items: start;
+}
+
+.vasp-toolbox-grid.has-output {
+  grid-template-columns: minmax(300px, 0.78fr) minmax(420px, 1.22fr);
+}
+
+.vasp-directory-panel {
+  align-content: start;
+}
+
+.vasp-directory-panel .source-mode-switch {
+  justify-self: start;
+}
+
+.vasp-host-path-input {
+  min-width: 0;
+}
+
+:global(.el-dialog.vasp-config-dialog) {
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--design-height, 100vh) - 100px);
+  max-height: calc(var(--design-height, 100vh) - 48px);
+  margin-top: calc(var(--design-height, 100vh) * 0.04) !important;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+:global(.el-dialog.vasp-config-dialog .el-dialog__header),
+:global(.el-dialog.vasp-config-dialog .el-dialog__footer) {
+  flex: 0 0 auto;
+}
+
+:global(.el-dialog.vasp-config-dialog .el-dialog__body) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+:global(.el-dialog.vasp-config-dialog .el-dialog__footer) {
+  border-top: 1px solid var(--app-border-soft);
+}
+
+:global(.el-dialog.vasp-config-dialog .vasp-dialog-mapping-editor) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.vasp-dialog-intro {
+  margin: 0 0 14px;
+  color: var(--app-text-muted);
+  line-height: 1.6;
+}
+
+.vasp-inline-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.vasp-convert-actions {
+  padding-top: 2px;
+  border-top: 1px solid var(--app-border-soft);
+}
+
+.vasp-directory-drop {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 4px 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px;
+  border: 1px dashed var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.vasp-directory-drop:hover,
+.vasp-directory-drop.selected {
+  border-color: var(--app-primary);
+  background: var(--app-primary-soft);
+}
+
+.vasp-directory-drop.converting {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.vasp-directory-drop .file-input-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.vasp-directory-icon {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(var(--app-primary-rgb), 0.2);
+  border-radius: var(--app-radius);
+  background: var(--app-card-elevated);
+  color: var(--app-primary);
+  font-size: 19px;
+}
+
+.vasp-directory-main,
+.vasp-directory-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vasp-directory-main {
+  color: var(--app-text);
+  font-weight: 800;
+}
+
+.vasp-directory-meta {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.vasp-files-summary {
+  --vasp-summary-action-width: 260px;
+  --vasp-summary-button-width: 128px;
+
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+}
+
+.vasp-files-summary-head {
+  display: grid;
+  gap: 3px;
+}
+
+.vasp-files-summary-head .section-heading {
+  margin: 0;
+}
+
+.vasp-files-summary-head span {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+}
+
+.vasp-files-summary-list {
+  display: grid;
+  border-top: 1px solid var(--app-border-soft);
+}
+
+.vasp-file-summary-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--app-border-soft);
+}
+
+.vasp-file-summary-item.has-config,
+.vasp-file-summary-item.has-inline-upload {
+  grid-template-columns: minmax(0, 1fr) var(--vasp-summary-action-width) auto;
+}
+
+.vasp-file-summary-item > div:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.vasp-file-summary-item strong {
+  color: var(--app-text);
+  font-family: var(--app-mono-font);
+  font-size: var(--app-font-size);
+}
+
+.vasp-file-summary-item > div:first-child span {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.vasp-file-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  text-align: right;
+}
+
+.vasp-file-config-button {
+  justify-self: end;
+  width: var(--vasp-summary-button-width);
+  min-height: 32px;
+  margin: 0;
+}
+
+.vasp-incar-upload-control {
+  display: grid;
+  gap: 8px;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.vasp-incar-upload-file {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+}
+
+.vasp-incar-upload-file-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+  font-size: 18px;
+}
+
+.vasp-incar-upload-file-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vasp-incar-upload-file-body strong,
+.vasp-incar-upload-file-body small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vasp-incar-upload-file-body strong {
+  color: var(--app-text);
+  font-size: var(--app-font-size);
+  font-weight: 700;
+}
+
+.vasp-incar-upload-file-body small {
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  font-weight: 400;
+}
+
+.vasp-incar-upload-control :deep(.el-button) {
+  justify-self: end;
+  width: var(--vasp-summary-button-width);
+  min-height: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 7px 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.vasp-incar-upload-control small {
+  display: block;
+  width: 100%;
+  font-size: var(--app-font-size-small);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.vasp-incar-upload-control small:last-child {
+  color: var(--app-text-muted);
+}
+
+.vasp-output-workspace {
+  min-width: 0;
+}
+
+.vasp-output-tabs :deep(.el-tabs__header) {
+  margin-bottom: 14px;
+}
+
+.vasp-input-notes {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.vasp-magmom {
+  min-width: 0;
+  overflow: auto hidden;
+  padding: 8px 10px;
+  border-left: 3px solid var(--app-primary);
+  background: var(--app-primary-soft);
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.vasp-magmom code {
+  color: var(--app-text);
+  font-family: var(--app-mono-font);
+}
+
+.tool-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius);
+  background: var(--app-card-elevated);
+}
+
+.tool-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tool-panel-head p {
+  margin: 4px 0 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+}
+
+.tool-panel-head .section-heading {
+  margin-bottom: 0;
+}
+
+.pyatb-form {
+  min-width: 0;
+}
+
+.pyatb-form :deep(.el-form-item) {
+  margin-bottom: 14px;
+}
+
+.pyatb-form :deep(.el-form-item:last-child) {
+  margin-bottom: 0;
+}
+
+.pyatb-source-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  max-width: 100%;
+}
+
+.pyatb-source-switch :deep(.el-radio) {
+  height: auto;
+  margin-right: 0;
+  color: var(--app-text);
+}
+
+.pyatb-source-switch :deep(.el-radio__label) {
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pyatb-source-switch :deep(.el-radio.is-checked .el-radio__label) {
+  color: var(--app-primary);
+}
+
+.pyatb-options-panel {
+  margin-top: 2px;
+  border-color: var(--app-border-soft);
+  background: var(--app-card-bg);
+}
+
+.pyatb-options-head {
+  font-size: var(--app-font-size-card-title);
+}
+
+.pyatb-options-toggle {
+  max-width: 100%;
+}
+
+.tool-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tool-action-row :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.field-tip {
+  margin-top: 4px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+}
+
+.toolbox-tabs :deep(.gen-input-inline-panel) {
+  display: block;
+  min-width: 0;
+}
+
+.toolbox-tabs :deep(.gen-input-inline-panel .mode-selection-wrapper) {
+  margin-bottom: 12px;
+}
+
+.toolbox-tabs :deep(.gen-input-inline-panel .gen-input-content) {
+  height: min(680px, calc(var(--design-height, 100vh) - 280px));
+  min-height: 520px;
+}
+
+.toolbox-tabs :deep(.gen-input-inline-panel .preview-actions) {
+  flex-wrap: wrap;
+}
+
+.toolbox-tabs :deep(.gen-input-inline-panel .preview-actions .el-button + .el-button) {
+  margin-left: 0;
+}
+
+@media (max-width: 1100px) {
+  .toolbox-grid,
+  .vasp-toolbox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbox-tabs :deep(.gen-input-inline-panel .gen-input-content) {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .toolbox-tabs :deep(.gen-input-inline-panel .params-section),
+  .toolbox-tabs :deep(.gen-input-inline-panel .preview-section) {
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .toolbox-shell {
+    padding: 12px;
+  }
+
+  .toolbox-tabs :deep(.el-tabs__item) {
+    padding: 0 12px;
+  }
+
+  .tool-panel {
+    padding: 12px;
+  }
+
+  .vasp-file-summary-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .vasp-file-summary-item.has-config {
+    grid-template-columns: 1fr;
+  }
+
+  .vasp-file-summary-item.has-inline-upload {
+    grid-template-columns: 1fr;
+  }
+
+  .vasp-file-summary-actions {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .toolbox-tabs :deep(.gen-input-inline-panel .params-section),
+  .toolbox-tabs :deep(.gen-input-inline-panel .preview-section) {
+    min-height: 460px;
+  }
+}
+</style>
+

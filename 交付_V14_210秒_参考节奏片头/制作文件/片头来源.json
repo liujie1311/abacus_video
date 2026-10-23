@@ -1,0 +1,17 @@
+{
+  "reference_file": "C:\\Users\\13118\\xwechat_files\\wxid_zml5uciivw6v22_70bd\\msg\\video\\2026-10\\0da312f692b46fe2d0afac91646097cf.mp4",
+  "reference_sha256": "821b7f7da546e95ac3d53373b7b7d6fe66c5217cbe428048480004f06a139f07",
+  "reference_scope": "first 6 seconds",
+  "borrowed": [
+    "left-aligned brand layout",
+    "staggered soft text reveal",
+    "right-side real login card",
+    "homepage dissolve"
+  ],
+  "reference_footage_used": false,
+  "palette": "light blue and white",
+  "progress_bar": false,
+  "source_video": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V13_210秒_登录背景_浅色无进度条\\ABACUSLab_3分30秒_浅色登录背景_无进度条.mp4",
+  "login_screenshot": "C:\\Users\\13118\\Desktop\\素材\\abacus_video\\交付_V14_210秒_参考节奏片头\\素材\\用户登录页截图.png",
+  "audio": "stream copied from V13"
+}

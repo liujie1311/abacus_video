@@ -1,0 +1,578 @@
+{
+  "text": "平台集成数十种常用材料计算模板，涵盖结构优化、电子结构、分子动力学及多种材料物性计算。 研究人员可以根据目标选择合适的模板，将基础计算和多步骤分析组织成可复用的工作流程，减少重复准备。 平台支持按项目组织计算任务，集中查看运行状态，并通过工具完成结构转换、输入文件准备与参数配置。计算结果还可以转化为直观的图表。从态密度到光学响应，研究人员能够观察数据变化、比较差异，为后续分析提供依据。",
+  "spoken_text": "平台集成数十种常用材料计算模板，涵盖结构优化、电子结构、分子动力学及多种材料物性计算。 研究人员可以根据目标选择合适的模板，将基础计算和多步骤分析组织成可复用的工作流程，减少重复准备。 平台支持按项目组织计算任务，集中查看运行状态，并通过工具完成结构转换、输入文件准备与参数配置。计算结果还可以转化为直观的图表。从态密度到光学响应，研究人员能够观察数据变化、比较差异，为后续分析提供依据。",
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+0%",
+  "events": [
+    {
+      "type": "WordBoundary",
+      "offset": 1000000,
+      "duration": 4125000,
+      "text": "平台"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 5250000,
+      "duration": 3875000,
+      "text": "集成"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 9375000,
+      "duration": 3875000,
+      "text": "数十"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 13250000,
+      "duration": 2250000,
+      "text": "种"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 15750000,
+      "duration": 4250000,
+      "text": "常用"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 20125000,
+      "duration": 4250000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 24625000,
+      "duration": 3375000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 28125000,
+      "duration": 4125000,
+      "text": "模板"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 35625000,
+      "duration": 4625000,
+      "text": "涵盖"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 40500000,
+      "duration": 3375000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 44000000,
+      "duration": 4250000,
+      "text": "优化"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 50625000,
+      "duration": 3500000,
+      "text": "电子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 54250000,
+      "duration": 3875000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 60625000,
+      "duration": 4125000,
+      "text": "分子"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 64875000,
+      "duration": 5625000,
+      "text": "动力学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 71625000,
+      "duration": 2500000,
+      "text": "及"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 74250000,
+      "duration": 4125000,
+      "text": "多种"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 78625000,
+      "duration": 4375000,
+      "text": "材料"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 83250000,
+      "duration": 3375000,
+      "text": "物性"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 86750000,
+      "duration": 3750000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 96250000,
+      "duration": 3125000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 99500000,
+      "duration": 3250000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 103000000,
+      "duration": 2625000,
+      "text": "可以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 105750000,
+      "duration": 2750000,
+      "text": "根据"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 108625000,
+      "duration": 4250000,
+      "text": "目标"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 113875000,
+      "duration": 3875000,
+      "text": "选择"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 118000000,
+      "duration": 4500000,
+      "text": "合适"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 122500000,
+      "duration": 875000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 123500000,
+      "duration": 4000000,
+      "text": "模板"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 130500000,
+      "duration": 2250000,
+      "text": "将"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 132875000,
+      "duration": 3250000,
+      "text": "基础"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 136250000,
+      "duration": 3500000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 140000000,
+      "duration": 1375000,
+      "text": "和"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 141500000,
+      "duration": 2375000,
+      "text": "多"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 143875000,
+      "duration": 3000000,
+      "text": "步骤"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 147000000,
+      "duration": 4250000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 152500000,
+      "duration": 4000000,
+      "text": "组织"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 156500000,
+      "duration": 2625000,
+      "text": "成"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 159375000,
+      "duration": 2000000,
+      "text": "可"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 161375000,
+      "duration": 3750000,
+      "text": "复用"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 165125000,
+      "duration": 1250000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 166625000,
+      "duration": 7500000,
+      "text": "工作流程"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 176375000,
+      "duration": 5375000,
+      "text": "减少"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 182000000,
+      "duration": 4250000,
+      "text": "重复"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 186375000,
+      "duration": 3750000,
+      "text": "准备"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 195750000,
+      "duration": 4250000,
+      "text": "平台"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 200125000,
+      "duration": 3500000,
+      "text": "支持"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 203750000,
+      "duration": 1750000,
+      "text": "按"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 205625000,
+      "duration": 2625000,
+      "text": "项目"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 208375000,
+      "duration": 3375000,
+      "text": "组织"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 212000000,
+      "duration": 3125000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 215250000,
+      "duration": 2875000,
+      "text": "任务"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 220750000,
+      "duration": 3625000,
+      "text": "集中"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 224500000,
+      "duration": 5000000,
+      "text": "查看"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 229750000,
+      "duration": 3500000,
+      "text": "运行"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 233375000,
+      "duration": 4000000,
+      "text": "状态"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 239500000,
+      "duration": 1625000,
+      "text": "并"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 241250000,
+      "duration": 3875000,
+      "text": "通过"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 245250000,
+      "duration": 4375000,
+      "text": "工具"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 250625000,
+      "duration": 5000000,
+      "text": "完成"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 255875000,
+      "duration": 3750000,
+      "text": "结构"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 259750000,
+      "duration": 4625000,
+      "text": "转换"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 267375000,
+      "duration": 3250000,
+      "text": "输入"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 270750000,
+      "duration": 3875000,
+      "text": "文件"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 274750000,
+      "duration": 4375000,
+      "text": "准备"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 280000000,
+      "duration": 1625000,
+      "text": "与"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 281750000,
+      "duration": 5000000,
+      "text": "参数"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 286875000,
+      "duration": 4250000,
+      "text": "配置"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 296875000,
+      "duration": 3500000,
+      "text": "计算"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 300500000,
+      "duration": 4125000,
+      "text": "结果"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 305875000,
+      "duration": 1875000,
+      "text": "还"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 307875000,
+      "duration": 2125000,
+      "text": "可以"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 310125000,
+      "duration": 4375000,
+      "text": "转化"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 314500000,
+      "duration": 1750000,
+      "text": "为"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 316375000,
+      "duration": 4125000,
+      "text": "直观"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 320500000,
+      "duration": 875000,
+      "text": "的"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 321500000,
+      "duration": 4750000,
+      "text": "图表"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 332000000,
+      "duration": 4875000,
+      "text": "从态"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 337000000,
+      "duration": 4375000,
+      "text": "密度"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 342500000,
+      "duration": 2500000,
+      "text": "到"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 345125000,
+      "duration": 3750000,
+      "text": "光学"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 349000000,
+      "duration": 3625000,
+      "text": "响应"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 355625000,
+      "duration": 2875000,
+      "text": "研究"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 358625000,
+      "duration": 3125000,
+      "text": "人员"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 362000000,
+      "duration": 3125000,
+      "text": "能够"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 365250000,
+      "duration": 4000000,
+      "text": "观察"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 369500000,
+      "duration": 3000000,
+      "text": "数据"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 372625000,
+      "duration": 4250000,
+      "text": "变化"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 378875000,
+      "duration": 2250000,
+      "text": "比较"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 381250000,
+      "duration": 4125000,
+      "text": "差异"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 388375000,
+      "duration": 1625000,
+      "text": "为"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 390125000,
+      "duration": 3875000,
+      "text": "后续"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 394125000,
+      "duration": 4250000,
+      "text": "分析"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 398625000,
+      "duration": 3500000,
+      "text": "提供"
+    },
+    {
+      "type": "WordBoundary",
+      "offset": 402250000,
+      "duration": 3625000,
+      "text": "依据"
+    }
+  ]
+}

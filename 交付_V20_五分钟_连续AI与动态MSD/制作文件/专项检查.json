@@ -1,0 +1,17 @@
+{
+  "dynamic_MSD_revealed_curve_pixels": [
+    0,
+    2743,
+    6413,
+    10273,
+    13643
+  ],
+  "final_chart_pixel_identical_to_scaled_source": true,
+  "liquid_median_displacement_15_seconds_pixels": 141.38924748980614,
+  "solid_max_displacement_from_site_pixels": 5.38,
+  "subtitle_count": 90,
+  "subtitle_overlaps": 0,
+  "question_shot_count": 1,
+  "case_number_heading_count": 0,
+  "parameter_view": "Full supplied parameter dialog, no additional crop"
+}

@@ -1,0 +1,10 @@
+{
+  "timeline_contiguous": true,
+  "duration_seconds": 300,
+  "shots": 39,
+  "chapters": 8,
+  "captions": 83,
+  "maximum_caption_width": 1327,
+  "narration_all_natural_speed": true,
+  "narration_inside_chapters": true
+}

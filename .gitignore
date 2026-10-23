@@ -1,0 +1,12 @@
+# Downloaded local runtimes and dependencies
+/tools/
+/packages/
+
+# Temporary files and Python caches
+/tmp/
+__pycache__/
+*.py[cod]
+
+# Generated intermediate video exceeds GitHub's 100 MiB file limit.
+# Keep the file locally; the rendering source and final videos are tracked.
+/交付_V14_210秒_参考节奏片头/制作文件/opening_7s.mkv

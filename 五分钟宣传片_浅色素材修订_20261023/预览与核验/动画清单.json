@@ -1,0 +1,66 @@
+[
+  {
+    "name": "M00_浅色立体原子片头_6秒",
+    "duration": 6,
+    "file": "01_浅色动画\\M00_浅色立体原子片头_6秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "7191458022c8df40ff49bec4ceb742a8c846aed08d9203757fe5ec0f3119bea4"
+  },
+  {
+    "name": "M01_微观晶体结构_浅色_12秒",
+    "duration": 12,
+    "file": "01_浅色动画\\M01_微观晶体结构_浅色_12秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "7080d0657dd1c8dfc1db7b04deb1e33d9cb50decddf79c50ccb5f8c619c1ef3e"
+  },
+  {
+    "name": "M02_材料探索空间_浅色_10秒",
+    "duration": 10,
+    "file": "01_浅色动画\\M02_材料探索空间_浅色_10秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "64fa7b8f1220f968eb3d8be49646662cbf42705be783a516aea52b26524053db"
+  },
+  {
+    "name": "M03_研发迭代流程_浅色_10秒",
+    "duration": 10,
+    "file": "01_浅色动画\\M03_研发迭代流程_浅色_10秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "f4662b255af1872482edb62b7edeea047945aefd5b359b4c9ce2adafbabb9eca"
+  },
+  {
+    "name": "M04_AI与计算流程_浅色_12秒",
+    "duration": 12,
+    "file": "01_浅色动画\\M04_AI与计算流程_浅色_12秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "6eaa44f1b11dda26b1a52e14f4992c624c2e1315e0df32312d907459eabbcfec"
+  },
+  {
+    "name": "M05_计算支撑设计_浅色_12秒",
+    "duration": 12,
+    "file": "01_浅色动画\\M05_计算支撑设计_浅色_12秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "68f4eb4db1a1af52689721fa09c94dd17c2189e2f00b7c3e944f7a624d7f242e"
+  },
+  {
+    "name": "M06_品牌循环背景_浅色_10秒",
+    "duration": 10,
+    "file": "01_浅色动画\\M06_品牌循环背景_浅色_10秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "原创程序概念动画",
+    "sha256": "02dc7740e230897d3c1f207a7427a0bdde0e970dadad9ce21f0cd6fa6a43799d"
+  },
+  {
+    "name": "M07_铝合金研究场景_MSD原图_10秒",
+    "duration": 10,
+    "file": "01_浅色动画\\M07_铝合金研究场景_MSD原图_10秒.mp4",
+    "format": "1920x1080, 30 fps, H.264, silent",
+    "source": "现有 MSD 原图＋编辑排版",
+    "sha256": "6e8a60884ef89480aad58f8781c8bdc5701dc8910fed4014ed90c55462c8b02c"
+  }
+]

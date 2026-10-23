@@ -1,0 +1,27 @@
+{
+  "duration_seconds": 300.0106666666667,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "shots": 56,
+  "chapters": [
+    0,
+    40,
+    70,
+    115,
+    155,
+    215,
+    250,
+    280,
+    300
+  ],
+  "audio_peak": 0.8057768940925598,
+  "decode_errors": 0,
+  "size_mb": 31.3,
+  "new_3d_assets": 14,
+  "image_generation_api_used": false,
+  "limitations": [
+    "原子运动为概念动画，非实际轨迹",
+    "电子云与电荷密度为概念示意",
+    "未获得同条件候选物性数据，设计段展示分析思路与已有图表功能"
+  ]
+}

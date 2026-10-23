@@ -1,0 +1,14 @@
+{
+  "duration_seconds": 300.0106666666667,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "decode_errors": 0,
+  "peak_audio": 0.7981953620910645,
+  "shots": 38,
+  "duplicate_primary_shots": 0,
+  "size_mb": 21.0,
+  "opening": "fixed composition, no per-frame resize",
+  "source_motion": "native 30 fps, no replay loops",
+  "brand": "user requested molecular login artwork",
+  "concept_animation": "MD motion is illustrative, not measured trajectory"
+}

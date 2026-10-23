@@ -1,0 +1,1165 @@
+<template>
+  <div class="page-stack workflow-detail-page" v-loading="workflowStore.detailLoading">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">工作流详情</h1>
+      </div>
+    </div>
+
+    <div v-if="!workflowStore.current" class="empty-block">正在加载工作流详情</div>
+    <template v-else>
+      <section class="workflow-detail-hero" :class="`status-${normalizeStatus(workflowStore.current.status)}`">
+        <span class="detail-state-emblem" :title="workflowStatusText(workflowStore.current.status)">
+          <el-icon>
+            <component :is="getStatusIcon(workflowStore.current.status)" />
+          </el-icon>
+        </span>
+        <div class="workflow-detail-copy">
+          <h2 :data-i18n-skip="workflowStore.current.name ? true : undefined">{{ workflowStore.current.name || '未命名工作流' }}</h2>
+          <div class="workflow-id-text">
+            <span>ID</span>
+            <strong>{{ workflowStore.current.id }}</strong>
+          </div>
+        </div>
+        <div
+          v-if="canShowRetryWorkflow(workflowStore.current) || canStopWorkflow(workflowStore.current)"
+          class="workflow-detail-actions"
+        >
+          <el-button
+            v-if="canShowRetryWorkflow(workflowStore.current)"
+            plain
+            :disabled="!canRetryWorkflow(workflowStore.current)"
+            :icon="RefreshRight"
+            @click="retry(workflowStore.current)"
+          >
+            重试
+          </el-button>
+          <el-button
+            v-if="canStopWorkflow(workflowStore.current)"
+            type="warning"
+            plain
+            :icon="VideoPause"
+            @click="stop(workflowStore.current)"
+          >
+            停止
+          </el-button>
+        </div>
+      </section>
+
+      <div
+        v-if="workflowStore.current.error"
+        class="workflow-error-alert"
+        role="alert"
+      >
+        <span class="workflow-error-icon">
+          <el-icon><CircleCloseFilled /></el-icon>
+        </span>
+        <div class="workflow-error-copy">
+          <strong>工作流错误</strong>
+          <p data-i18n-skip>{{ workflowStore.current.error }}</p>
+        </div>
+      </div>
+
+      <div class="workflow-detail-grid">
+        <section class="detail-panel task-panel">
+          <div class="panel-head">
+            <div>
+              <h2>任务详情</h2>
+              <p>点击任务查看日志</p>
+            </div>
+          </div>
+
+          <div v-if="workflowStore.tasks.length" class="task-detail-list">
+            <article
+              v-for="(task, index) in workflowStore.tasks"
+              :key="getTaskId(task) || `${getTaskStepId(task)}-${index}`"
+              class="task-detail-card"
+              :class="[
+                `status-${normalizeStatus(task.status)}`,
+                { active: getTaskId(task) === selectedTaskId },
+              ]"
+              @click="selectTask(task)"
+            >
+              <span class="task-index">{{ index + 1 }}</span>
+              <span class="task-state-emblem" :title="workflowStatusText(task.status)">
+                <el-icon>
+                  <component :is="getStatusIcon(task.status)" />
+                </el-icon>
+              </span>
+              <div class="task-copy">
+                <div class="task-title-row">
+                  <strong>{{ getTaskStepId(task) }}</strong>
+                  <span v-if="getTaskType(task) !== '-'" class="task-type-tag">{{ getTaskType(task) }}</span>
+                </div>
+                <div v-if="getTaskRetryCount(task) > 0" class="task-meta-row">
+                  <span v-if="getTaskRetryCount(task) > 0">重试 {{ getTaskRetryCount(task) }}</span>
+                </div>
+                <div v-if="getTaskId(task)" class="task-id-line" :title="getTaskId(task)">
+                  <span class="task-id-label">ID:</span>
+                  <span class="task-id-value">{{ getTaskId(task) }}</span>
+                  <el-button
+                    link
+                    type="primary"
+                    size="small"
+                    :icon="CopyDocument"
+                    class="task-inline-copy"
+                    @click.stop="copyTaskId(task)"
+                  >
+                    复制
+                  </el-button>
+                </div>
+                <div v-if="getTaskTimeEntries(task).length" class="task-time-row">
+                  <span v-for="entry in getTaskTimeEntries(task)" :key="entry.key" :title="formatDate(entry.value)">
+                    <span>{{ entry.label }}</span>
+                    <strong>{{ formatDate(entry.value) }}</strong>
+                  </span>
+                </div>
+                <div v-if="getTaskCopyablePaths(task).length" class="task-output-list">
+                  <div v-for="entry in getTaskCopyablePaths(task)" :key="entry.key" class="task-output-row" :title="entry.path">
+                    <span class="task-output-label">{{ entry.label }}</span>
+                    <button
+                      v-if="isBrowsableTaskPathEntry(entry)"
+                      type="button"
+                      class="task-output-path task-output-path-link"
+                      :title="entry.path"
+                      data-i18n-skip
+                      @click.stop="openHostFileBrowser(entry.path)"
+                    >
+                      {{ entry.path }}
+                    </button>
+                    <span v-else class="task-output-path" :title="entry.path" data-i18n-skip>{{ entry.path }}</span>
+                    <el-button link type="primary" :icon="CopyDocument" @click.stop="copyTaskPath(entry.path)">
+                      复制
+                    </el-button>
+                  </div>
+                </div>
+                <p v-if="task.error" class="task-error" data-i18n-skip>{{ task.error }}</p>
+              </div>
+            </article>
+          </div>
+          <div v-else class="empty-block compact">暂无任务步骤</div>
+        </section>
+
+        <section class="detail-panel log-panel">
+          <div class="panel-head">
+            <div>
+              <h2>任务日志</h2>
+              <p>{{ selectedTaskId || '请选择任务' }}</p>
+            </div>
+          </div>
+
+          <pre class="code-preview workflow-log-preview">{{ logText }}</pre>
+        </section>
+      </div>
+
+      <HostFileBrowserDialog
+        v-model:visible="hostFileBrowserVisible"
+        :initial-path="hostFileBrowserInitialPath"
+      />
+    </template>
+  </div>
+</template>
+
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  CircleCheckFilled,
+  CircleCloseFilled,
+  Clock,
+  CopyDocument,
+  Loading,
+  RefreshRight,
+  VideoPause,
+  WarningFilled,
+} from '@element-plus/icons-vue'
+
+import { getWorkflowTaskLogs } from '@/api/workflows'
+import HostFileBrowserDialog from '@/views/host-files/HostFileBrowserDialog.vue'
+import { useEventStore } from '@/stores/events'
+import { useWorkflowStore } from '@/stores/workflows'
+import { copyTextToClipboard } from '@/utils/clipboard'
+import { formatDate, formatJson, workflowStatusText } from '@/utils/format'
+import { createRealtimeLogEntry, isSameRealtimeLog } from '@/utils/workflowRealtime'
+
+const route = useRoute()
+const router = useRouter()
+const eventStore = useEventStore()
+const workflowStore = useWorkflowStore()
+const selectedTaskId = ref('')
+const taskLogs = ref([])
+const hostFileBrowserVisible = ref(false)
+const hostFileBrowserInitialPath = ref('')
+const statusIcons = {
+  cancelled: CircleCloseFilled,
+  completed: CircleCheckFilled,
+  failed: WarningFilled,
+  paused: VideoPause,
+  pending: Clock,
+  running: Loading,
+  skipped: CircleCloseFilled,
+}
+const realtimeRefreshDelay = 800
+let currentReloadTimer = 0
+let taskLogReloadTimer = 0
+let taskLogRequestSeq = 0
+let currentReloadWorkflowId = ''
+let taskLogReloadTarget = {
+  workflowId: '',
+  taskId: '',
+}
+
+const workflowId = computed(() => String(route.params.workflowId || ''))
+const routeProjectId = computed(() => String(route.query.project_id || route.query.projectId || '').trim())
+const routeTemplateId = computed(() => String(route.query.template_id || route.query.templateId || '').trim())
+function getRawLogText(item) {
+  if (typeof item === 'string') {
+    return item
+  }
+
+  if (!item) {
+    return ''
+  }
+
+  const rawText = item.message ?? item.content ?? item.text ?? item.line
+  return rawText === undefined || rawText === null ? formatJson(item) : String(rawText)
+}
+
+const logText = computed(() => {
+  const logs = taskLogs.value
+
+  if (!logs?.length) {
+    return '暂无日志'
+  }
+
+  return logs
+    .map(getRawLogText)
+    .filter((line) => line !== '')
+    .join('\n')
+})
+const latestRealtimeEventId = computed(() => eventStore.latestEvent?.id || '')
+
+async function loadWorkflowDetail() {
+  if (!workflowId.value) {
+    router.replace({
+      path: '/workflows',
+      query: buildWorkflowListQuery(),
+    })
+    return
+  }
+
+  selectedTaskId.value = ''
+  taskLogs.value = []
+
+  try {
+    await workflowStore.selectWorkflow(workflowId.value)
+    await selectFirstTask()
+  } catch {
+    router.replace({
+      path: '/workflows',
+      query: buildWorkflowListQuery(),
+    })
+  }
+}
+
+async function ensureTaskSelection() {
+  if (
+    selectedTaskId.value &&
+    workflowStore.tasks.some((task) => getTaskId(task) === selectedTaskId.value)
+  ) {
+    await loadTaskLogsById(selectedTaskId.value)
+    return
+  }
+
+  await selectFirstTask()
+}
+
+async function selectFirstTask() {
+  const firstTask = workflowStore.tasks.find((task) => getTaskId(task))
+
+  if (!firstTask) {
+    selectedTaskId.value = ''
+    taskLogs.value = []
+    return
+  }
+
+  selectedTaskId.value = getTaskId(firstTask)
+  await loadTaskLogsById(selectedTaskId.value)
+}
+
+function buildWorkflowListQuery() {
+  return {
+    ...(routeProjectId.value ? { project_id: routeProjectId.value } : {}),
+    ...(routeTemplateId.value ? { template_id: routeTemplateId.value } : {}),
+  }
+}
+
+async function selectTask(task) {
+  const taskId = getTaskId(task)
+
+  if (!taskId) {
+    ElMessage.warning('任务 ID 缺失')
+    return
+  }
+
+  selectedTaskId.value = taskId
+  await loadTaskLogsById(taskId)
+}
+
+async function loadTaskLogsById(taskId) {
+  if (!workflowId.value || !taskId) {
+    return
+  }
+
+  const requestSeq = ++taskLogRequestSeq
+
+  taskLogs.value = []
+  const logs = await getWorkflowTaskLogs(workflowId.value, taskId)
+
+  if (requestSeq === taskLogRequestSeq && selectedTaskId.value === taskId) {
+    taskLogs.value = logs
+  }
+}
+
+function openHostFileBrowser(path) {
+  const text = String(path || '').trim()
+
+  if (!text) {
+    ElMessage.warning('该任务暂无可浏览的目录')
+    return
+  }
+
+  hostFileBrowserInitialPath.value = text
+  hostFileBrowserVisible.value = true
+}
+
+async function retry(workflow) {
+  if (!canRetryWorkflow(workflow)) {
+    return
+  }
+
+  await workflowStore.retry(workflow.id)
+  ElMessage.success('已提交重试')
+}
+
+async function stop(workflow) {
+  if (!canStopWorkflow(workflow)) {
+    return
+  }
+
+  const confirmed = await ElMessageBox.confirm(`确认停止工作流「${workflow.name}」？`, '停止工作流', {
+    type: 'warning',
+  })
+    .then(() => true)
+    .catch(() => false)
+
+  if (!confirmed) {
+    return
+  }
+
+  await workflowStore.stop(workflow.id)
+  ElMessage.success('已停止')
+}
+
+async function copyTaskPath(path) {
+  if (!path) {
+    ElMessage.warning('该任务暂无可复制的目录')
+    return
+  }
+
+  try {
+    await copyTextToClipboard(path)
+    ElMessage.success('路径已复制')
+  } catch {
+    ElMessage.error('复制失败，请手动选择内容复制')
+  }
+}
+
+async function copyTaskId(task) {
+  const taskId = getTaskId(task)
+
+  if (!taskId) {
+    ElMessage.warning('该任务暂无可复制的 ID')
+    return
+  }
+
+  try {
+    await copyTextToClipboard(taskId)
+    ElMessage.success('任务 ID 已复制')
+  } catch {
+    ElMessage.error('复制失败，请手动选择内容复制')
+  }
+}
+
+function normalizeStatus(status) {
+  return String(status || 'unknown')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+}
+
+function getStatusIcon(status) {
+  return statusIcons[normalizeStatus(status)] || Clock
+}
+
+function getFinishTimeLabel(status) {
+  if (status === 'failed') {
+    return '失败'
+  }
+
+  if (status === 'cancelled') {
+    return '取消'
+  }
+
+  return '完成'
+}
+
+function canRetryWorkflow(workflow) {
+  return Boolean(workflow?.id) && normalizeStatus(workflow?.status) !== 'running' && canShowRetryWorkflow(workflow)
+}
+
+function canShowRetryWorkflow(workflow) {
+  return normalizeStatus(workflow?.status) !== 'completed'
+}
+
+function canStopWorkflow(workflow) {
+  return normalizeStatus(workflow?.status) === 'running'
+}
+
+function getTaskId(task) {
+  return task?.id || task?.task_id || ''
+}
+
+function getTaskStepId(task) {
+  return task?.step_id || task?.stepId || getTaskId(task) || '-'
+}
+
+function getTaskType(task) {
+  return task?.type || task?.task_type || '-'
+}
+
+function getTaskRetryCount(task) {
+  return Math.max(0, Number(task?.retry_count || task?.retryCount || task?.retries || 0) || 0)
+}
+
+function getTaskTimeEntries(task) {
+  if (!task) {
+    return []
+  }
+
+  const status = normalizeStatus(task.status)
+  const finalTime =
+    task.completed_at ||
+    task.finished_at ||
+    task.ended_at ||
+    task.end_time ||
+    (['completed', 'failed', 'cancelled'].includes(status) ? task.updated_at : '')
+  const entries = [
+    { key: 'created_at', label: '创建', value: task.created_at },
+    { key: 'started_at', label: '开始', value: task.started_at },
+    { key: 'completed_at', label: getFinishTimeLabel(status), value: finalTime },
+  ]
+
+  if (!finalTime && task.updated_at && task.updated_at !== task.created_at) {
+    entries.push({ key: 'updated_at', label: '更新', value: task.updated_at })
+  }
+
+  return entries.filter((entry) => Boolean(entry.value))
+}
+
+function getTaskCopyablePaths(task) {
+  const outputs = task?.outputs && typeof task.outputs === 'object' ? task.outputs : {}
+  return ['workdir', 'output_dir']
+    .map((key) => ({
+      key,
+      label: getTaskPathLabel(key),
+      path: String(outputs[key] || '').trim(),
+    }))
+    .filter((entry) => isPathLikeValue(entry.path))
+}
+
+function getTaskPathLabel(key) {
+  const labels = {
+    workdir: '工作目录',
+    output_dir: '输出目录',
+  }
+
+  return labels[key] || key
+}
+
+function isBrowsableTaskPathEntry(entry) {
+  return ['workdir', 'output_dir'].includes(entry?.key || '')
+}
+
+function isPathLikeValue(value) {
+  if (typeof value !== 'string') {
+    return false
+  }
+
+  const text = value.trim()
+  return /^([A-Za-z]:[\\/]|\/|\\\\)/.test(text)
+}
+
+function appendSelectedTaskLog(event) {
+  const logEntry = createRealtimeLogEntry(event)
+
+  if (!logEntry || taskLogs.value.some((log) => isSameRealtimeLog(log, logEntry))) {
+    return
+  }
+
+  taskLogs.value = [...taskLogs.value, logEntry]
+}
+
+function scheduleCurrentReload(reloadWorkflowId) {
+  if (!reloadWorkflowId || workflowStore.current?.id !== reloadWorkflowId) {
+    return
+  }
+
+  currentReloadWorkflowId = reloadWorkflowId
+
+  if (currentReloadTimer) {
+    return
+  }
+
+  currentReloadTimer = window.setTimeout(async () => {
+    const targetWorkflowId = currentReloadWorkflowId
+
+    currentReloadTimer = 0
+    currentReloadWorkflowId = ''
+
+    if (workflowStore.current?.id !== targetWorkflowId) {
+      return
+    }
+
+    try {
+      await workflowStore.reloadCurrent()
+      await ensureTaskSelection()
+    } catch {
+      // 请求拦截器会统一展示错误，这里只避免定时任务产生未处理异常。
+    }
+  }, realtimeRefreshDelay)
+}
+
+function scheduleSelectedTaskLogsReload(reloadWorkflowId, taskId) {
+  if (!reloadWorkflowId || !taskId) {
+    return
+  }
+
+  taskLogReloadTarget = {
+    workflowId: reloadWorkflowId,
+    taskId,
+  }
+
+  if (taskLogReloadTimer) {
+    return
+  }
+
+  taskLogReloadTimer = window.setTimeout(async () => {
+    const reloadTarget = taskLogReloadTarget
+
+    taskLogReloadTimer = 0
+    taskLogReloadTarget = {
+      workflowId: '',
+      taskId: '',
+    }
+
+    if (workflowStore.current?.id !== reloadTarget.workflowId || selectedTaskId.value !== reloadTarget.taskId) {
+      return
+    }
+
+    try {
+      await loadTaskLogsById(reloadTarget.taskId)
+    } catch {
+      // 请求拦截器会统一展示错误，这里只避免定时任务产生未处理异常。
+    }
+  }, realtimeRefreshDelay)
+}
+
+function handleRealtimeEvent(event) {
+  const result = workflowStore.applyRealtimeEvent(event)
+
+  if (!result?.workflowId || result.workflowId !== workflowId.value) {
+    return
+  }
+
+  scheduleCurrentReload(result.workflowId)
+
+  if (selectedTaskId.value && result.taskId === selectedTaskId.value) {
+    appendSelectedTaskLog(event)
+    scheduleSelectedTaskLogsReload(result.workflowId, result.taskId)
+  }
+}
+
+onMounted(async () => {
+  eventStore.connect()
+  await loadWorkflowDetail()
+})
+
+watch(workflowId, loadWorkflowDetail)
+watch(latestRealtimeEventId, () => handleRealtimeEvent(eventStore.latestEvent))
+
+onBeforeUnmount(() => {
+  window.clearTimeout(currentReloadTimer)
+  window.clearTimeout(taskLogReloadTimer)
+})
+</script>
+
+<style scoped>
+.workflow-detail-page {
+  min-width: 0;
+}
+
+.workflow-detail-hero,
+.task-detail-card {
+  --status-color: var(--app-primary);
+  --status-soft: var(--app-primary-soft);
+  --status-border: var(--el-color-primary-light-7);
+  --status-contrast: var(--app-primary-strong);
+}
+
+.workflow-detail-hero.status-running,
+.task-detail-card.status-running {
+  --status-color: var(--app-primary);
+  --status-soft: var(--app-primary-soft);
+  --status-border: var(--el-color-primary-light-7);
+  --status-contrast: var(--app-primary-strong);
+}
+
+.workflow-detail-hero.status-completed,
+.task-detail-card.status-completed {
+  --status-color: var(--app-success);
+  --status-soft: var(--app-success-soft);
+  --status-border: var(--app-success-border);
+  --status-contrast: var(--app-success);
+}
+
+.workflow-detail-hero.status-failed,
+.task-detail-card.status-failed {
+  --status-color: var(--app-danger);
+  --status-soft: var(--app-danger-soft);
+  --status-border: var(--app-danger-border);
+  --status-contrast: var(--app-danger);
+}
+
+.workflow-detail-hero.status-paused,
+.task-detail-card.status-paused {
+  --status-color: var(--app-warning);
+  --status-soft: var(--app-warning-soft);
+  --status-border: var(--app-warning-border);
+  --status-contrast: var(--app-warning);
+}
+
+.workflow-detail-hero.status-pending,
+.workflow-detail-hero.status-cancelled,
+.workflow-detail-hero.status-skipped,
+.task-detail-card.status-pending,
+.task-detail-card.status-cancelled,
+.task-detail-card.status-skipped {
+  --status-color: var(--app-info);
+  --status-soft: var(--app-info-soft);
+  --status-border: var(--app-info-border);
+  --status-contrast: var(--app-info);
+}
+
+.detail-state-emblem,
+.task-state-emblem {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--status-border);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  color: var(--status-color);
+}
+
+.workflow-detail-hero {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--status-border);
+  border-radius: var(--app-radius);
+  background: var(--status-soft);
+}
+
+.detail-state-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+  font-size: 20px;
+}
+
+.workflow-detail-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.workflow-detail-copy h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.workflow-id-text,
+.task-time-row > span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  min-width: 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size);
+  line-height: 1.55;
+}
+
+.workflow-id-text span,
+.task-time-row > span > span {
+  color: var(--app-text-soft);
+  font-weight: 400;
+}
+
+.workflow-id-text strong,
+.task-time-row strong {
+  min-width: 0;
+  color: var(--app-text-muted);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size);
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-id-text strong {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.task-time-row {
+  display: grid;
+  gap: 3px 10px;
+  min-width: 0;
+}
+
+.task-time-row {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.workflow-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workflow-detail-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+.workflow-error-alert {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto !important;
+  min-width: 0;
+  min-height: 52px;
+  padding: 12px 14px;
+  overflow: visible !important;
+  border: 1px solid var(--app-danger-border);
+  border-radius: var(--app-radius);
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+.workflow-error-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 999px;
+  background: var(--app-danger);
+  color: #fff;
+  font-size: 14px;
+}
+
+.workflow-error-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workflow-error-copy strong {
+  font-size: var(--app-font-size-small);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.workflow-error-copy p {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-small);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.workflow-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.1fr);
+  align-items: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.detail-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-card-bg);
+}
+
+.log-panel {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-head h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: var(--app-font-size-section);
+  font-weight: 900;
+}
+
+.panel-head p {
+  margin: 4px 0 0;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.task-detail-list {
+  display: grid;
+  gap: 10px;
+}
+
+.task-detail-card {
+  display: grid;
+  grid-template-columns: 34px 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--status-border);
+  border-left: 4px solid var(--status-color);
+  border-radius: var(--app-radius);
+  background: var(--app-card-elevated);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.task-detail-card:hover {
+  border-color: var(--status-color);
+  background: var(--app-card-bg);
+  box-shadow: var(--app-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.task-detail-card.active {
+  border-color: var(--status-color);
+  border-left-color: var(--status-color);
+  background: var(--status-soft);
+  box-shadow:
+    inset 4px 0 0 var(--status-color),
+    0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.task-detail-card.active .task-index,
+.task-detail-card.active .task-state-emblem {
+  border: 1px solid var(--status-border);
+  background: var(--app-card-bg);
+  color: var(--status-color);
+}
+
+.task-index,
+.task-state-emblem {
+  width: 28px;
+  height: 28px;
+}
+
+.task-index {
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius);
+  background: var(--app-primary-soft);
+  color: var(--app-primary-strong);
+  font-size: var(--app-font-size-small);
+  font-weight: 900;
+}
+
+.task-state-emblem {
+  font-size: var(--app-font-size);
+}
+
+.task-detail-card.status-running .task-state-emblem .el-icon {
+  animation: workflowSpin 1.2s linear infinite;
+}
+
+.task-copy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.task-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.task-title-row strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-type-tag {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border: 1px solid #9bbcff;
+  border-radius: 4px;
+  background: #fff;
+  color: #3d63ff;
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-tiny);
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.task-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--app-text-muted);
+  font-size: var(--app-font-size-small);
+}
+
+.task-output-list {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.task-output-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.task-id-line {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+  padding: 3px 0;
+  color: var(--app-text-muted);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-small);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.task-id-label {
+  flex: 0 0 auto;
+  color: var(--app-text-soft);
+  font-family: var(--app-font-family);
+  font-weight: 700;
+}
+
+.task-id-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-inline-copy {
+  flex: 0 0 auto;
+  min-height: auto;
+  padding: 0 2px;
+  font-size: var(--app-font-size-tiny);
+}
+
+.task-output-label {
+  color: var(--app-text-soft);
+  font-size: var(--app-font-size-tiny);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.task-output-path {
+  min-width: 0;
+  color: var(--app-text-muted);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-output-path-link {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--app-primary-strong);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.task-output-path-link:hover {
+  color: var(--app-primary);
+}
+
+.task-error {
+  margin: 0;
+  color: var(--el-color-danger);
+  font-size: var(--app-font-size-small);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.workflow-log-preview {
+  max-height: calc(var(--design-height, 100vh) - 220px);
+  min-height: 360px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  scrollbar-gutter: stable;
+}
+
+.compact {
+  min-height: 86px;
+}
+
+@keyframes workflowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1280px) {
+  .workflow-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .log-panel {
+    position: static;
+  }
+
+  .workflow-log-preview {
+    max-height: 560px;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-head {
+    display: grid;
+  }
+
+  .workflow-detail-hero {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .workflow-detail-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .task-detail-card {
+    grid-template-columns: 34px 34px minmax(0, 1fr);
+  }
+
+}
+
+@media (max-width: 560px) {
+  .detail-panel {
+    padding: 12px;
+  }
+
+  .task-detail-card {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .task-state-emblem {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .task-copy,
+  .workflow-detail-actions {
+    grid-column: 2;
+  }
+
+  .workflow-detail-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .task-output-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .task-id-line {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+  }
+}
+</style>
+
